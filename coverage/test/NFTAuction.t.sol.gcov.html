@@ -1,0 +1,1016 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - lcov.info - test/NFTAuction.t.sol</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory test">test</a> - NFTAuction.t.sol<span style="font-size: 80%;"> (source / <a href="NFTAuction.t.sol.func-c.html" title="Click to go to function table">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">lcov.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryMed">87.0&nbsp;%</td>
+            <td class="headerCovTableEntry">77</td>
+            <td class="headerCovTableEntry">67</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2026-01-12 16:53:21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryHi">94.7&nbsp;%</td>
+            <td class="headerCovTableEntry">19</td>
+            <td class="headerCovTableEntry">18</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntryLo">55.6&nbsp;%</td>
+            <td class="headerCovTableEntry">18</td>
+            <td class="headerCovTableEntry">10</td>
+          </tr>
+                  <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">             Branch data     Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>                 :             : // SPDX-License-Identifier: MIT</span>
+<span id="L2"><span class="lineNum">       2</span>                 :             : pragma solidity ^0.8.28;</span>
+<span id="L3"><span class="lineNum">       3</span>                 :             : </span>
+<span id="L4"><span class="lineNum">       4</span>                 :             : import &quot;forge-std/Test.sol&quot;;</span>
+<span id="L5"><span class="lineNum">       5</span>                 :             : import &quot;../src/NFTAuction.sol&quot;;</span>
+<span id="L6"><span class="lineNum">       6</span>                 :             : import &quot;../src/NFThan.sol&quot;; // 导入NFT合约</span>
+<span id="L7"><span class="lineNum">       7</span>                 :             : import &quot;forge-std/console.sol&quot;;  // 添加console.sol导入</span>
+<span id="L8"><span class="lineNum">       8</span>                 :             : </span>
+<span id="L9"><span class="lineNum">       9</span>                 :             : // Chainlink价格预言机模拟合约</span>
+<span id="L10"><span class="lineNum">      10</span>                 :             : contract MockV3Aggregator {</span>
+<span id="L11"><span class="lineNum">      11</span>                 :             :     int256 public answer;</span>
+<span id="L12"><span class="lineNum">      12</span>                 :             :     </span>
+<span id="L13"><span class="lineNum">      13</span>                 :<span class="tlaGNC">          76 :     constructor(int256 initialAnswer) {</span></span>
+<span id="L14"><span class="lineNum">      14</span>                 :<span class="tlaGNC">          76 :         answer = initialAnswer;</span></span>
+<span id="L15"><span class="lineNum">      15</span>                 :             :     }</span>
+<span id="L16"><span class="lineNum">      16</span>                 :             :     </span>
+<span id="L17"><span class="lineNum">      17</span>                 :<span class="tlaGNC">          58 :     function latestRoundData()</span></span>
+<span id="L18"><span class="lineNum">      18</span>                 :             :         external</span>
+<span id="L19"><span class="lineNum">      19</span>                 :             :         view</span>
+<span id="L20"><span class="lineNum">      20</span>                 :             :         returns (</span>
+<span id="L21"><span class="lineNum">      21</span>                 :             :             uint80 roundId,</span>
+<span id="L22"><span class="lineNum">      22</span>                 :             :             int256 ans,</span>
+<span id="L23"><span class="lineNum">      23</span>                 :             :             uint256 startedAt,</span>
+<span id="L24"><span class="lineNum">      24</span>                 :             :             uint256 updatedAt,</span>
+<span id="L25"><span class="lineNum">      25</span>                 :             :             uint80 answeredInRound</span>
+<span id="L26"><span class="lineNum">      26</span>                 :             :         )</span>
+<span id="L27"><span class="lineNum">      27</span>                 :             :     {</span>
+<span id="L28"><span class="lineNum">      28</span>                 :<span class="tlaGNC">          58 :         return (0, answer, block.timestamp, block.timestamp, 0);</span></span>
+<span id="L29"><span class="lineNum">      29</span>                 :             :     }</span>
+<span id="L30"><span class="lineNum">      30</span>                 :             : }</span>
+<span id="L31"><span class="lineNum">      31</span>                 :             : </span>
+<span id="L32"><span class="lineNum">      32</span>                 :             : //测试合约</span>
+<span id="L33"><span class="lineNum">      33</span>                 :             : contract NFTAuctionTest is Test { </span>
+<span id="L34"><span class="lineNum">      34</span>                 :             :     NFTAuction public nftAuction;</span>
+<span id="L35"><span class="lineNum">      35</span>                 :             :     NFThan public nftContract;// NFT合约实例</span>
+<span id="L36"><span class="lineNum">      36</span>                 :             :     address public owner  = address(0x1);</span>
+<span id="L37"><span class="lineNum">      37</span>                 :             :     address public seller = address(0x2);</span>
+<span id="L38"><span class="lineNum">      38</span>                 :             :     address public buyer1 = address(0x3);</span>
+<span id="L39"><span class="lineNum">      39</span>                 :             :     address public buyer2 = address(0x4);</span>
+<span id="L40"><span class="lineNum">      40</span>                 :             :     address public buyer3 = address(0x5);</span>
+<span id="L41"><span class="lineNum">      41</span>                 :             :     address public feeReceiver = address(0x6);</span>
+<span id="L42"><span class="lineNum">      42</span>                 :             :     uint public listingId;</span>
+<span id="L43"><span class="lineNum">      43</span>                 :             :     uint public listingId2;</span>
+<span id="L44"><span class="lineNum">      44</span>                 :             : </span>
+<span id="L45"><span class="lineNum">      45</span>                 :             :     // Mock代币合约</span>
+<span id="L46"><span class="lineNum">      46</span>                 :             :     MockERC20 public mockToken;</span>
+<span id="L47"><span class="lineNum">      47</span>                 :             :     </span>
+<span id="L48"><span class="lineNum">      48</span>                 :             :     // Mock价格预言机</span>
+<span id="L49"><span class="lineNum">      49</span>                 :             :     MockV3Aggregator public ethPriceFeed;</span>
+<span id="L50"><span class="lineNum">      50</span>                 :             :     MockV3Aggregator public tokenPriceFeed;</span>
+<span id="L51"><span class="lineNum">      51</span>                 :             : </span>
+<span id="L52"><span class="lineNum">      52</span>                 :             :     event AuctionCreated(</span>
+<span id="L53"><span class="lineNum">      53</span>                 :             :         uint indexed auctionId,</span>
+<span id="L54"><span class="lineNum">      54</span>                 :             :         address indexed seller,</span>
+<span id="L55"><span class="lineNum">      55</span>                 :             :         address indexed nftContract,</span>
+<span id="L56"><span class="lineNum">      56</span>                 :             :         uint tokenId,</span>
+<span id="L57"><span class="lineNum">      57</span>                 :             :         uint start_price,</span>
+<span id="L58"><span class="lineNum">      58</span>                 :             :         uint end_time</span>
+<span id="L59"><span class="lineNum">      59</span>                 :             :     );</span>
+<span id="L60"><span class="lineNum">      60</span>                 :             :     event BidPlaced(</span>
+<span id="L61"><span class="lineNum">      61</span>                 :             :         uint indexed auctionId,</span>
+<span id="L62"><span class="lineNum">      62</span>                 :             :         address indexed bidder,</span>
+<span id="L63"><span class="lineNum">      63</span>                 :             :         uint bidAmount</span>
+<span id="L64"><span class="lineNum">      64</span>                 :             :     );</span>
+<span id="L65"><span class="lineNum">      65</span>                 :             :     event AuctionEnded(</span>
+<span id="L66"><span class="lineNum">      66</span>                 :             :         uint indexed auctionId,</span>
+<span id="L67"><span class="lineNum">      67</span>                 :             :         address indexed winner,</span>
+<span id="L68"><span class="lineNum">      68</span>                 :             :         uint winningBid</span>
+<span id="L69"><span class="lineNum">      69</span>                 :             :     );</span>
+<span id="L70"><span class="lineNum">      70</span>                 :             : </span>
+<span id="L71"><span class="lineNum">      71</span>                 :             :     function setUp() public { </span>
+<span id="L72"><span class="lineNum">      72</span>                 :             :         nftAuction = new NFTAuction();</span>
+<span id="L73"><span class="lineNum">      73</span>                 :             :         nftAuction.initialize(feeReceiver);</span>
+<span id="L74"><span class="lineNum">      74</span>                 :             : </span>
+<span id="L75"><span class="lineNum">      75</span>                 :             :         // 创建Mock价格预言机</span>
+<span id="L76"><span class="lineNum">      76</span>                 :             :         ethPriceFeed = new MockV3Aggregator(2000000000000000000); // 2000 USD/ETH (18 decimals)</span>
+<span id="L77"><span class="lineNum">      77</span>                 :             :         tokenPriceFeed = new MockV3Aggregator(100000000); // 1 USD per token (8 decimals for Chainlink)</span>
+<span id="L78"><span class="lineNum">      78</span>                 :             :         </span>
+<span id="L79"><span class="lineNum">      79</span>                 :             :         // 设置价格预言机</span>
+<span id="L80"><span class="lineNum">      80</span>                 :             :         nftAuction.setPriceFeed(address(0), address(ethPriceFeed)); // ETH/USD feed</span>
+<span id="L81"><span class="lineNum">      81</span>                 :             :         nftAuction.setPriceFeed(address(1), address(tokenPriceFeed)); // Token/USD feed (using address(1) as mock token)</span>
+<span id="L82"><span class="lineNum">      82</span>                 :             : </span>
+<span id="L83"><span class="lineNum">      83</span>                 :             :         //账户资金初始化</span>
+<span id="L84"><span class="lineNum">      84</span>                 :             :         vm.deal(seller, 100 ether);</span>
+<span id="L85"><span class="lineNum">      85</span>                 :             :         vm.deal(buyer1, 100 ether);</span>
+<span id="L86"><span class="lineNum">      86</span>                 :             :         vm.deal(buyer2, 100 ether);</span>
+<span id="L87"><span class="lineNum">      87</span>                 :             :         vm.deal(buyer3, 100 ether);</span>
+<span id="L88"><span class="lineNum">      88</span>                 :             :       </span>
+<span id="L89"><span class="lineNum">      89</span>                 :             :         //给seller账户提供NFT合约地址和tokenId</span>
+<span id="L90"><span class="lineNum">      90</span>                 :             :         nftContract = new NFThan(&quot;TestNFT&quot;, &quot;TNFT&quot;);</span>
+<span id="L91"><span class="lineNum">      91</span>                 :             :         vm.prank(seller);</span>
+<span id="L92"><span class="lineNum">      92</span>                 :             :         uint tokenId = nftContract.mint{value: 0.01 ether}(&quot;ipfs://test-metadata&quot;);</span>
+<span id="L93"><span class="lineNum">      93</span>                 :             : </span>
+<span id="L94"><span class="lineNum">      94</span>                 :             :         //seller批准NFT拍卖合约可以操作其NFT</span>
+<span id="L95"><span class="lineNum">      95</span>                 :             :         vm.prank(seller);</span>
+<span id="L96"><span class="lineNum">      96</span>                 :             :         nftContract.approve(address(nftAuction), tokenId);</span>
+<span id="L97"><span class="lineNum">      97</span>                 :             :         console.log(&quot;Seller approved NFTAuction to manage tokenId: %s&quot;, tokenId);</span>
+<span id="L98"><span class="lineNum">      98</span>                 :             : </span>
+<span id="L99"><span class="lineNum">      99</span>                 :             :     }</span>
+<span id="L100"><span class="lineNum">     100</span>                 :             :     // 测试初始化合约</span>
+<span id="L101"><span class="lineNum">     101</span>                 :             :     function test_CanInitializeContract() public view {</span>
+<span id="L102"><span class="lineNum">     102</span>                 :             :         console.log(&quot;Contract Owner: %s&quot;, nftAuction.owner());</span>
+<span id="L103"><span class="lineNum">     103</span>                 :             :         console.log(&quot;Fee Receiver: %s&quot;, nftAuction.feeReceiver());</span>
+<span id="L104"><span class="lineNum">     104</span>                 :             :         assertEq(nftAuction.feeReceiver(), feeReceiver);</span>
+<span id="L105"><span class="lineNum">     105</span>                 :             :     }</span>
+<span id="L106"><span class="lineNum">     106</span>                 :             :     // 测试：手续费接收者初始化为零地址的情况</span>
+<span id="L107"><span class="lineNum">     107</span>                 :             :     function test_InitializeWithZeroAddressShouldFail() public {</span>
+<span id="L108"><span class="lineNum">     108</span>                 :             :         NFTAuction newAuction = new NFTAuction();</span>
+<span id="L109"><span class="lineNum">     109</span>                 :             :         vm.expectRevert(&quot;Invalid address&quot;);</span>
+<span id="L110"><span class="lineNum">     110</span>                 :             :         newAuction.initialize(address(0));</span>
+<span id="L111"><span class="lineNum">     111</span>                 :             :     }</span>
+<span id="L112"><span class="lineNum">     112</span>                 :             :     /************测试创建拍卖start***********/</span>
+<span id="L113"><span class="lineNum">     113</span>                 :             :     //场景1：参数正常且功能正常</span>
+<span id="L114"><span class="lineNum">     114</span>                 :             :     function test_CanCreateAuction() public {</span>
+<span id="L115"><span class="lineNum">     115</span>                 :             :         vm.prank(seller);</span>
+<span id="L116"><span class="lineNum">     116</span>                 :             :         (listingId) = nftAuction.createAuction(</span>
+<span id="L117"><span class="lineNum">     117</span>                 :             :             address(nftContract),</span>
+<span id="L118"><span class="lineNum">     118</span>                 :             :             1,</span>
+<span id="L119"><span class="lineNum">     119</span>                 :             :             0.05 ether,</span>
+<span id="L120"><span class="lineNum">     120</span>                 :             :             block.timestamp + 1 days</span>
+<span id="L121"><span class="lineNum">     121</span>                 :             :         );</span>
+<span id="L122"><span class="lineNum">     122</span>                 :             :         (address r_seller, address r_nftContract, uint tokenId, uint start_price, uint end_time, , , ,) = nftAuction.getAuctions(listingId);</span>
+<span id="L123"><span class="lineNum">     123</span>                 :             :         assertEq(seller, r_seller);</span>
+<span id="L124"><span class="lineNum">     124</span>                 :             :         assertEq(address(nftContract), address(r_nftContract));</span>
+<span id="L125"><span class="lineNum">     125</span>                 :             :         assertEq(tokenId, 1);</span>
+<span id="L126"><span class="lineNum">     126</span>                 :             :         assertEq(start_price, 0.05 ether);</span>
+<span id="L127"><span class="lineNum">     127</span>                 :             :         assertEq(end_time, block.timestamp + 1 days);</span>
+<span id="L128"><span class="lineNum">     128</span>                 :             :         assertEq(nftAuction.getAuctionCount(), 1);</span>
+<span id="L129"><span class="lineNum">     129</span>                 :             :     }</span>
+<span id="L130"><span class="lineNum">     130</span>                 :             : </span>
+<span id="L131"><span class="lineNum">     131</span>                 :             :     //场景2：测试非所有者无法创建拍卖</span>
+<span id="L132"><span class="lineNum">     132</span>                 :             :     function test_CannotCreateAuctionIfNotOwner() public {</span>
+<span id="L133"><span class="lineNum">     133</span>                 :             :         vm.prank(buyer1);</span>
+<span id="L134"><span class="lineNum">     134</span>                 :             :         vm.expectRevert(&quot;You are not the owner of this NFT&quot;);</span>
+<span id="L135"><span class="lineNum">     135</span>                 :             :         nftAuction.createAuction(</span>
+<span id="L136"><span class="lineNum">     136</span>                 :             :             address(nftContract),</span>
+<span id="L137"><span class="lineNum">     137</span>                 :             :             1,</span>
+<span id="L138"><span class="lineNum">     138</span>                 :             :             0.05 ether,</span>
+<span id="L139"><span class="lineNum">     139</span>                 :             :             block.timestamp + 1 days</span>
+<span id="L140"><span class="lineNum">     140</span>                 :             :         );</span>
+<span id="L141"><span class="lineNum">     141</span>                 :             :     }</span>
+<span id="L142"><span class="lineNum">     142</span>                 :             : </span>
+<span id="L143"><span class="lineNum">     143</span>                 :             :     //场景3：未授权的合约无法创建拍卖</span>
+<span id="L144"><span class="lineNum">     144</span>                 :             :     function test_CannotCreateAuctionIfNotApproved() public {</span>
+<span id="L145"><span class="lineNum">     145</span>                 :             :         vm.prank(seller);</span>
+<span id="L146"><span class="lineNum">     146</span>                 :             :         //铸造新的未授权的NFT</span>
+<span id="L147"><span class="lineNum">     147</span>                 :             :         uint TokenId2 = nftContract.mint{value: 0.01 ether}(&quot;ipfs://test-metadata2&quot;);</span>
+<span id="L148"><span class="lineNum">     148</span>                 :             : </span>
+<span id="L149"><span class="lineNum">     149</span>                 :             :         vm.prank(seller);</span>
+<span id="L150"><span class="lineNum">     150</span>                 :             :         vm.expectRevert(&quot;NFT is not approved&quot;);</span>
+<span id="L151"><span class="lineNum">     151</span>                 :             :         nftAuction.createAuction(</span>
+<span id="L152"><span class="lineNum">     152</span>                 :             :             address(nftContract),</span>
+<span id="L153"><span class="lineNum">     153</span>                 :             :             TokenId2,</span>
+<span id="L154"><span class="lineNum">     154</span>                 :             :             0.05 ether,</span>
+<span id="L155"><span class="lineNum">     155</span>                 :             :             block.timestamp + 1 days</span>
+<span id="L156"><span class="lineNum">     156</span>                 :             :         );</span>
+<span id="L157"><span class="lineNum">     157</span>                 :             :     }</span>
+<span id="L158"><span class="lineNum">     158</span>                 :             : </span>
+<span id="L159"><span class="lineNum">     159</span>                 :             :     //3.1：测试授权所有代币的情况成功创建拍卖</span>
+<span id="L160"><span class="lineNum">     160</span>                 :             :     function test_CanCreateAuctionIfApprovedForAll() public {</span>
+<span id="L161"><span class="lineNum">     161</span>                 :             :         vm.startPrank(seller);</span>
+<span id="L162"><span class="lineNum">     162</span>                 :             :         //铸造新的未授权的NFT</span>
+<span id="L163"><span class="lineNum">     163</span>                 :             :         uint TokenId2 = nftContract.mint{value: 0.01 ether}(&quot;ipfs://test-metadata2&quot;);</span>
+<span id="L164"><span class="lineNum">     164</span>                 :             : </span>
+<span id="L165"><span class="lineNum">     165</span>                 :             :         nftContract.setApprovalForAll(address(nftAuction), true);</span>
+<span id="L166"><span class="lineNum">     166</span>                 :             :         (listingId2) = nftAuction.createAuction(</span>
+<span id="L167"><span class="lineNum">     167</span>                 :             :             address(nftContract),</span>
+<span id="L168"><span class="lineNum">     168</span>                 :             :             TokenId2,</span>
+<span id="L169"><span class="lineNum">     169</span>                 :             :             0.05 ether,</span>
+<span id="L170"><span class="lineNum">     170</span>                 :             :             block.timestamp + 1 days</span>
+<span id="L171"><span class="lineNum">     171</span>                 :             :         );</span>
+<span id="L172"><span class="lineNum">     172</span>                 :             :         (, , uint tokenId, , , , , ,) = nftAuction.getAuctions(listingId2);</span>
+<span id="L173"><span class="lineNum">     173</span>                 :             :         vm.stopPrank();</span>
+<span id="L174"><span class="lineNum">     174</span>                 :             :         assertEq(tokenId, TokenId2);</span>
+<span id="L175"><span class="lineNum">     175</span>                 :             :     }</span>
+<span id="L176"><span class="lineNum">     176</span>                 :             : </span>
+<span id="L177"><span class="lineNum">     177</span>                 :             :     //场景4：测试创建拍卖时的结束时间大于当前时间</span>
+<span id="L178"><span class="lineNum">     178</span>                 :             :     function test_CannotCreateAuctionIfEndTimeInvalid() public {</span>
+<span id="L179"><span class="lineNum">     179</span>                 :             :         // 保存当前时间，然后创建一个过去的时间点</span>
+<span id="L180"><span class="lineNum">     180</span>                 :             :         uint currentTime = block.timestamp;</span>
+<span id="L181"><span class="lineNum">     181</span>                 :             :         vm.warp(currentTime + 100); // 快进一些时间</span>
+<span id="L182"><span class="lineNum">     182</span>                 :             :         vm.prank(seller);</span>
+<span id="L183"><span class="lineNum">     183</span>                 :             :         vm.expectRevert(&quot;End time must be in the future&quot;);</span>
+<span id="L184"><span class="lineNum">     184</span>                 :             :         nftAuction.createAuction(</span>
+<span id="L185"><span class="lineNum">     185</span>                 :             :             address(nftContract),</span>
+<span id="L186"><span class="lineNum">     186</span>                 :             :             1,</span>
+<span id="L187"><span class="lineNum">     187</span>                 :             :             0.05 ether,</span>
+<span id="L188"><span class="lineNum">     188</span>                 :             :             currentTime</span>
+<span id="L189"><span class="lineNum">     189</span>                 :             :         );</span>
+<span id="L190"><span class="lineNum">     190</span>                 :             :     }</span>
+<span id="L191"><span class="lineNum">     191</span>                 :             : </span>
+<span id="L192"><span class="lineNum">     192</span>                 :             :     //场景5：测试创建拍卖时的起价大于0</span>
+<span id="L193"><span class="lineNum">     193</span>                 :             :     function test_CannotCreateAuctionIfStartPriceInvalid() public {</span>
+<span id="L194"><span class="lineNum">     194</span>                 :             :         vm.prank(seller);</span>
+<span id="L195"><span class="lineNum">     195</span>                 :             :         vm.expectRevert(&quot;Invalid number,cannot be zero&quot;);</span>
+<span id="L196"><span class="lineNum">     196</span>                 :             :         nftAuction.createAuction(</span>
+<span id="L197"><span class="lineNum">     197</span>                 :             :             address(nftContract),</span>
+<span id="L198"><span class="lineNum">     198</span>                 :             :             1,</span>
+<span id="L199"><span class="lineNum">     199</span>                 :             :             0 ether,</span>
+<span id="L200"><span class="lineNum">     200</span>                 :             :             block.timestamp + 1 days</span>
+<span id="L201"><span class="lineNum">     201</span>                 :             :         );</span>
+<span id="L202"><span class="lineNum">     202</span>                 :             :     }</span>
+<span id="L203"><span class="lineNum">     203</span>                 :             : </span>
+<span id="L204"><span class="lineNum">     204</span>                 :             :     //场景6：测试创建拍卖时NFT合约地址不为0地址</span>
+<span id="L205"><span class="lineNum">     205</span>                 :             :     function test_CannotCreateAuctionIfNFTContractIsZeroAddress() public {</span>
+<span id="L206"><span class="lineNum">     206</span>                 :             :         vm.prank(seller);</span>
+<span id="L207"><span class="lineNum">     207</span>                 :             :         vm.expectRevert(&quot;Invalid address&quot;);</span>
+<span id="L208"><span class="lineNum">     208</span>                 :             :         nftAuction.createAuction(</span>
+<span id="L209"><span class="lineNum">     209</span>                 :             :             address(0),</span>
+<span id="L210"><span class="lineNum">     210</span>                 :             :             1,</span>
+<span id="L211"><span class="lineNum">     211</span>                 :             :             0.05 ether,</span>
+<span id="L212"><span class="lineNum">     212</span>                 :             :             block.timestamp + 1 days</span>
+<span id="L213"><span class="lineNum">     213</span>                 :             :         );</span>
+<span id="L214"><span class="lineNum">     214</span>                 :             :     }</span>
+<span id="L215"><span class="lineNum">     215</span>                 :             : </span>
+<span id="L216"><span class="lineNum">     216</span>                 :             :     //场景7：测试创建拍卖时NFT的ID不为0</span>
+<span id="L217"><span class="lineNum">     217</span>                 :             :     function test_CannotCreateAuctionIfTokenIdIsZero() public {</span>
+<span id="L218"><span class="lineNum">     218</span>                 :             :         vm.prank(seller);</span>
+<span id="L219"><span class="lineNum">     219</span>                 :             :         vm.expectRevert(&quot;Invalid number,cannot be zero&quot;);</span>
+<span id="L220"><span class="lineNum">     220</span>                 :             :         nftAuction.createAuction(</span>
+<span id="L221"><span class="lineNum">     221</span>                 :             :             address(nftContract),</span>
+<span id="L222"><span class="lineNum">     222</span>                 :             :             0,</span>
+<span id="L223"><span class="lineNum">     223</span>                 :             :             0.05 ether,</span>
+<span id="L224"><span class="lineNum">     224</span>                 :             :             block.timestamp + 1 days</span>
+<span id="L225"><span class="lineNum">     225</span>                 :             :         );</span>
+<span id="L226"><span class="lineNum">     226</span>                 :             :     }</span>
+<span id="L227"><span class="lineNum">     227</span>                 :             : </span>
+<span id="L228"><span class="lineNum">     228</span>                 :             :     //场景8：测试创建拍卖时NFT的tokenId不存在</span>
+<span id="L229"><span class="lineNum">     229</span>                 :             :     function test_CannotCreateAuctionIfTokenIdDoesNotExist() public {</span>
+<span id="L230"><span class="lineNum">     230</span>                 :             :         vm.prank(seller);</span>
+<span id="L231"><span class="lineNum">     231</span>                 :             :         vm.expectRevert();</span>
+<span id="L232"><span class="lineNum">     232</span>                 :             :         nftAuction.createAuction(</span>
+<span id="L233"><span class="lineNum">     233</span>                 :             :             address(nftContract),</span>
+<span id="L234"><span class="lineNum">     234</span>                 :             :             200,</span>
+<span id="L235"><span class="lineNum">     235</span>                 :             :             0.05 ether,</span>
+<span id="L236"><span class="lineNum">     236</span>                 :             :             block.timestamp + 1 days</span>
+<span id="L237"><span class="lineNum">     237</span>                 :             :         );</span>
+<span id="L238"><span class="lineNum">     238</span>                 :             :     }</span>
+<span id="L239"><span class="lineNum">     239</span>                 :             : </span>
+<span id="L240"><span class="lineNum">     240</span>                 :             :     //场景9：测试创建拍卖时结束时间为0时间</span>
+<span id="L241"><span class="lineNum">     241</span>                 :             :     function test_CannotCreateAuctionIfEndTimeIsZero() public {</span>
+<span id="L242"><span class="lineNum">     242</span>                 :             :         vm.prank(seller);</span>
+<span id="L243"><span class="lineNum">     243</span>                 :             :         vm.expectRevert(&quot;Invalid number,cannot be zero&quot;);</span>
+<span id="L244"><span class="lineNum">     244</span>                 :             :         nftAuction.createAuction(</span>
+<span id="L245"><span class="lineNum">     245</span>                 :             :             address(nftContract),</span>
+<span id="L246"><span class="lineNum">     246</span>                 :             :             1,</span>
+<span id="L247"><span class="lineNum">     247</span>                 :             :             0.05 ether,</span>
+<span id="L248"><span class="lineNum">     248</span>                 :             :             0</span>
+<span id="L249"><span class="lineNum">     249</span>                 :             :         );</span>
+<span id="L250"><span class="lineNum">     250</span>                 :             :     }</span>
+<span id="L251"><span class="lineNum">     251</span>                 :             : </span>
+<span id="L252"><span class="lineNum">     252</span>                 :             : </span>
+<span id="L253"><span class="lineNum">     253</span>                 :             :     /************测试创建拍卖end***********/</span>
+<span id="L254"><span class="lineNum">     254</span>                 :             : </span>
+<span id="L255"><span class="lineNum">     255</span>                 :             : </span>
+<span id="L256"><span class="lineNum">     256</span>                 :             :     /************测试出价start***********/</span>
+<span id="L257"><span class="lineNum">     257</span>                 :             : </span>
+<span id="L258"><span class="lineNum">     258</span>                 :             :     // 场景1: 参数正常且功能正常(使用eth结算)</span>
+<span id="L259"><span class="lineNum">     259</span>                 :             :     function test_CanPlaceBid() public { </span>
+<span id="L260"><span class="lineNum">     260</span>                 :             :         //调用统一封装函数创建拍卖</span>
+<span id="L261"><span class="lineNum">     261</span>                 :             :         listingId = createTestAuction(1, 0.05 ether, block.timestamp + 1 days);</span>
+<span id="L262"><span class="lineNum">     262</span>                 :             : </span>
+<span id="L263"><span class="lineNum">     263</span>                 :             :         //出价</span>
+<span id="L264"><span class="lineNum">     264</span>                 :             :         vm.prank(buyer1);</span>
+<span id="L265"><span class="lineNum">     265</span>                 :             :         nftAuction.bidNFT{value: 0.06 ether}(listingId, 0.06 ether,address(0));</span>
+<span id="L266"><span class="lineNum">     266</span>                 :             :     }</span>
+<span id="L267"><span class="lineNum">     267</span>                 :             : </span>
+<span id="L268"><span class="lineNum">     268</span>                 :             :     // 场景1.1: 测试出价低于起拍价或者低于当前最高价（eth结算）</span>
+<span id="L269"><span class="lineNum">     269</span>                 :             :     function test_CannotPlaceBidIfPriceTooLow() public {</span>
+<span id="L270"><span class="lineNum">     270</span>                 :             :         //调用统一封装函数创建拍卖</span>
+<span id="L271"><span class="lineNum">     271</span>                 :             :         listingId = createTestAuction(1, 0.05 ether, block.timestamp + 1 days);</span>
+<span id="L272"><span class="lineNum">     272</span>                 :             : </span>
+<span id="L273"><span class="lineNum">     273</span>                 :             :         //出价</span>
+<span id="L274"><span class="lineNum">     274</span>                 :             :         vm.prank(buyer1);</span>
+<span id="L275"><span class="lineNum">     275</span>                 :             :         vm.expectRevert(&quot;Bid must be higher than the current highest bid&quot;);</span>
+<span id="L276"><span class="lineNum">     276</span>                 :             :         nftAuction.bidNFT{value: 0.04 ether}(listingId, 0.04 ether,address(0));</span>
+<span id="L277"><span class="lineNum">     277</span>                 :             :     }</span>
+<span id="L278"><span class="lineNum">     278</span>                 :             : </span>
+<span id="L279"><span class="lineNum">     279</span>                 :             :     // 场景1.2: 测试出价时ETH转账失败的情况</span>
+<span id="L280"><span class="lineNum">     280</span>                 :             :     function test_BidNFTWithInsufficientETH() public {</span>
+<span id="L281"><span class="lineNum">     281</span>                 :             :         listingId = createTestAuction(1, 0.05 ether, block.timestamp + 1 days);</span>
+<span id="L282"><span class="lineNum">     282</span>                 :             :         </span>
+<span id="L283"><span class="lineNum">     283</span>                 :             :         vm.prank(buyer1);</span>
+<span id="L284"><span class="lineNum">     284</span>                 :             :         // 发送比实际出价少的ETH，但试图出更高金额</span>
+<span id="L285"><span class="lineNum">     285</span>                 :             :         vm.expectRevert();</span>
+<span id="L286"><span class="lineNum">     286</span>                 :             :         nftAuction.bidNFT{value: 0.01 ether}(listingId, 0.06 ether, address(0));</span>
+<span id="L287"><span class="lineNum">     287</span>                 :             :     }</span>
+<span id="L288"><span class="lineNum">     288</span>                 :             : </span>
+<span id="L289"><span class="lineNum">     289</span>                 :             :     // 场景2: 测试使用erc20结算</span>
+<span id="L290"><span class="lineNum">     290</span>                 :             :     function test_CanPlaceBidWithERC20() public { </span>
+<span id="L291"><span class="lineNum">     291</span>                 :             :         //调用统一封装函数创建拍卖</span>
+<span id="L292"><span class="lineNum">     292</span>                 :             :         listingId = createTestAuction(1, 0.05 ether, block.timestamp + 1 days);</span>
+<span id="L293"><span class="lineNum">     293</span>                 :             : </span>
+<span id="L294"><span class="lineNum">     294</span>                 :             :         //部署Mock ERC20代币合约</span>
+<span id="L295"><span class="lineNum">     295</span>                 :             :         mockToken = new MockERC20(&quot;MockToken&quot;, &quot;MTK&quot;, 1000000 * 10**18);</span>
+<span id="L296"><span class="lineNum">     296</span>                 :             :         console.log(&quot;Mock ERC20 deployed at: %s&quot;, address(mockToken));</span>
+<span id="L297"><span class="lineNum">     297</span>                 :             : </span>
+<span id="L298"><span class="lineNum">     298</span>                 :             :         // 设置Mock代币的价格预言机 - 使1代币价值约为1ETH，这样少量代币就能超过起拍价</span>
+<span id="L299"><span class="lineNum">     299</span>                 :             :         MockV3Aggregator tokenPriceFeed2 = new MockV3Aggregator(2000000000000000000); // 2000 USD per token (same as ETH)</span>
+<span id="L300"><span class="lineNum">     300</span>                 :             :         vm.prank(owner);</span>
+<span id="L301"><span class="lineNum">     301</span>                 :             :         nftAuction.setPriceFeed(address(mockToken), address(tokenPriceFeed2));</span>
+<span id="L302"><span class="lineNum">     302</span>                 :             :         </span>
+<span id="L303"><span class="lineNum">     303</span>                 :             :         //给buyer1分发代币</span>
+<span id="L304"><span class="lineNum">     304</span>                 :             :         mockToken.transfer(buyer1, 1000 * 10**18);</span>
+<span id="L305"><span class="lineNum">     305</span>                 :             : </span>
+<span id="L306"><span class="lineNum">     306</span>                 :             :         //buyer1批准NFT拍卖合约可以操作其代币</span>
+<span id="L307"><span class="lineNum">     307</span>                 :             :         vm.prank(buyer1);</span>
+<span id="L308"><span class="lineNum">     308</span>                 :             :         mockToken.approve(address(nftAuction), 100 * 10**18);</span>
+<span id="L309"><span class="lineNum">     309</span>                 :             : </span>
+<span id="L310"><span class="lineNum">     310</span>                 :             :         //出价 - 使用较小的数量，因为每个代币价值很高</span>
+<span id="L311"><span class="lineNum">     311</span>                 :             :         vm.prank(buyer1);</span>
+<span id="L312"><span class="lineNum">     312</span>                 :             :         nftAuction.bidNFT(listingId, 1 * 10**17,address(mockToken)); // 0.1个代币</span>
+<span id="L313"><span class="lineNum">     313</span>                 :             :     }</span>
+<span id="L314"><span class="lineNum">     314</span>                 :             : </span>
+<span id="L315"><span class="lineNum">     315</span>                 :             : </span>
+<span id="L316"><span class="lineNum">     316</span>                 :             :     // 场景2.2: 测试余额不足（erc20结算）</span>
+<span id="L317"><span class="lineNum">     317</span>                 :             :     function test_CannotPlaceBidIfERC20BalanceInsufficient() public {</span>
+<span id="L318"><span class="lineNum">     318</span>                 :             :         //调用统一封装函数创建拍卖</span>
+<span id="L319"><span class="lineNum">     319</span>                 :             :         listingId = createTestAuction(1, 0.05 ether, block.timestamp + 1 days);</span>
+<span id="L320"><span class="lineNum">     320</span>                 :             : </span>
+<span id="L321"><span class="lineNum">     321</span>                 :             :         //部署Mock ERC20代币合约</span>
+<span id="L322"><span class="lineNum">     322</span>                 :             :         mockToken = new MockERC20(&quot;MockToken&quot;, &quot;MTK&quot;, 1000000 * 10**18);</span>
+<span id="L323"><span class="lineNum">     323</span>                 :             :         // 设置Mock代币的价格预言机 - 使1代币价值约为1ETH，这样少量代币就能超过起拍价</span>
+<span id="L324"><span class="lineNum">     324</span>                 :             :         MockV3Aggregator tokenPriceFeed2 = new MockV3Aggregator(2000000000000000000); // 2000 USD per token (same as ETH)</span>
+<span id="L325"><span class="lineNum">     325</span>                 :             :         vm.prank(owner);</span>
+<span id="L326"><span class="lineNum">     326</span>                 :             :         nftAuction.setPriceFeed(address(mockToken), address(tokenPriceFeed2));</span>
+<span id="L327"><span class="lineNum">     327</span>                 :             :         </span>
+<span id="L328"><span class="lineNum">     328</span>                 :             :         //给buyer1分发很少的代币</span>
+<span id="L329"><span class="lineNum">     329</span>                 :             :         mockToken.transfer(buyer1, 0.04 * 10**18); // 只给0.5个代币</span>
+<span id="L330"><span class="lineNum">     330</span>                 :             :         </span>
+<span id="L331"><span class="lineNum">     331</span>                 :             :         //buyer1批准NFT拍卖合约可以操作其代币</span>
+<span id="L332"><span class="lineNum">     332</span>                 :             :         vm.prank(buyer1);</span>
+<span id="L333"><span class="lineNum">     333</span>                 :             :         mockToken.approve(address(nftAuction), 0.04 * 10**18);  </span>
+<span id="L334"><span class="lineNum">     334</span>                 :             : </span>
+<span id="L335"><span class="lineNum">     335</span>                 :             :         // 尝试出价0.2个代币，但只有0.2个代币，transferFrom会失败</span>
+<span id="L336"><span class="lineNum">     336</span>                 :             :         vm.prank(buyer1);</span>
+<span id="L337"><span class="lineNum">     337</span>                 :             :         vm.expectRevert(); </span>
+<span id="L338"><span class="lineNum">     338</span>                 :             :         nftAuction.bidNFT(listingId, 0.05 * 10**18, address(mockToken)); </span>
+<span id="L339"><span class="lineNum">     339</span>                 :             :     }</span>
+<span id="L340"><span class="lineNum">     340</span>                 :             : </span>
+<span id="L341"><span class="lineNum">     341</span>                 :             :     //场景2.3：测试出价低于起拍价或者低于当前最高价（erc20结算）</span>
+<span id="L342"><span class="lineNum">     342</span>                 :             :     function test_CannotPlaceBidWithERC20IfPriceTooLow() public {</span>
+<span id="L343"><span class="lineNum">     343</span>                 :             :         //调用统一封装函数创建拍卖</span>
+<span id="L344"><span class="lineNum">     344</span>                 :             :         listingId = createTestAuction(1, 0.05 ether, block.timestamp + 1 days);</span>
+<span id="L345"><span class="lineNum">     345</span>                 :             : </span>
+<span id="L346"><span class="lineNum">     346</span>                 :             :         //部署Mock ERC20代币合约</span>
+<span id="L347"><span class="lineNum">     347</span>                 :             :         mockToken = new MockERC20(&quot;MockToken&quot;, &quot;MTK&quot;, 1000000 * 10**18);</span>
+<span id="L348"><span class="lineNum">     348</span>                 :             :         // 创建价格预言机，设为1ETH per token</span>
+<span id="L349"><span class="lineNum">     349</span>                 :             :         MockV3Aggregator tokenPriceFeed2 = new MockV3Aggregator(1000000000000000000); // 1 ETH per token</span>
+<span id="L350"><span class="lineNum">     350</span>                 :             :         vm.prank(owner);</span>
+<span id="L351"><span class="lineNum">     351</span>                 :             :         nftAuction.setPriceFeed(address(mockToken), address(tokenPriceFeed2));</span>
+<span id="L352"><span class="lineNum">     352</span>                 :             :         //给buyer1分发代币</span>
+<span id="L353"><span class="lineNum">     353</span>                 :             :         mockToken.transfer(buyer1, 1000 * 10**18);</span>
+<span id="L354"><span class="lineNum">     354</span>                 :             :         // buyer1批准NFT拍卖合约可以操作其代币</span>
+<span id="L355"><span class="lineNum">     355</span>                 :             :         vm.prank(buyer1);</span>
+<span id="L356"><span class="lineNum">     356</span>                 :             :         mockToken.approve(address(nftAuction), 100 * 10**18);</span>
+<span id="L357"><span class="lineNum">     357</span>                 :             :         </span>
+<span id="L358"><span class="lineNum">     358</span>                 :             :         // 出价0.04个代币，价值0.04ETH，低于起拍价0.05ETH</span>
+<span id="L359"><span class="lineNum">     359</span>                 :             :         vm.prank(buyer1);</span>
+<span id="L360"><span class="lineNum">     360</span>                 :             :         vm.expectRevert(&quot;Bid must be higher than the current highest bid&quot;);</span>
+<span id="L361"><span class="lineNum">     361</span>                 :             :         nftAuction.bidNFT(listingId, 0.04 * 10**18, address(mockToken));</span>
+<span id="L362"><span class="lineNum">     362</span>                 :             :     }</span>
+<span id="L363"><span class="lineNum">     363</span>                 :             :     // 场景3: 测试是否是卖家出价</span>
+<span id="L364"><span class="lineNum">     364</span>                 :             :     function test_CannotPlaceBidIfNotSeller() public {</span>
+<span id="L365"><span class="lineNum">     365</span>                 :             :         //调用统一封装函数创建拍卖</span>
+<span id="L366"><span class="lineNum">     366</span>                 :             :         listingId = createTestAuction(1, 0.05 ether, block.timestamp + 1 days);</span>
+<span id="L367"><span class="lineNum">     367</span>                 :             : </span>
+<span id="L368"><span class="lineNum">     368</span>                 :             :         //出价</span>
+<span id="L369"><span class="lineNum">     369</span>                 :             :         vm.prank(seller);</span>
+<span id="L370"><span class="lineNum">     370</span>                 :             :         vm.expectRevert(&quot;You are the seller&quot;);</span>
+<span id="L371"><span class="lineNum">     371</span>                 :             :         nftAuction.bidNFT{value: 0.06 ether}(listingId, 0.06 ether,address(0));</span>
+<span id="L372"><span class="lineNum">     372</span>                 :             :     }</span>
+<span id="L373"><span class="lineNum">     373</span>                 :             : </span>
+<span id="L374"><span class="lineNum">     374</span>                 :             :     //场景4：拍卖时间已经结束</span>
+<span id="L375"><span class="lineNum">     375</span>                 :             :     function test_CannotPlaceBidIfAuctionEnded() public { </span>
+<span id="L376"><span class="lineNum">     376</span>                 :             :         </span>
+<span id="L377"><span class="lineNum">     377</span>                 :             :         listingId = createTestAuction(1, 0.05 ether, block.timestamp + 1 days);</span>
+<span id="L378"><span class="lineNum">     378</span>                 :             :         //出价</span>
+<span id="L379"><span class="lineNum">     379</span>                 :             :         vm.prank(buyer1);</span>
+<span id="L380"><span class="lineNum">     380</span>                 :             :         nftAuction.bidNFT{value: 0.06 ether}(listingId, 0.06 ether,address(0));</span>
+<span id="L381"><span class="lineNum">     381</span>                 :             :         vm.warp(block.timestamp + 2 days);</span>
+<span id="L382"><span class="lineNum">     382</span>                 :             : </span>
+<span id="L383"><span class="lineNum">     383</span>                 :             :         vm.prank(buyer2);</span>
+<span id="L384"><span class="lineNum">     384</span>                 :             :         vm.expectRevert(&quot;Auction has ended&quot;);</span>
+<span id="L385"><span class="lineNum">     385</span>                 :             :         nftAuction.bidNFT{value: 0.07 ether}(listingId, 0.07 ether, address(0));</span>
+<span id="L386"><span class="lineNum">     386</span>                 :             :     }</span>
+<span id="L387"><span class="lineNum">     387</span>                 :             : </span>
+<span id="L388"><span class="lineNum">     388</span>                 :             :     //场景5：测试是否退还上一个最高出价者的出价（eth结算）</span>
+<span id="L389"><span class="lineNum">     389</span>                 :             :     function test_CanRefundPreviousBidder() public {</span>
+<span id="L390"><span class="lineNum">     390</span>                 :             :         //调用统一封装函数创建拍卖</span>
+<span id="L391"><span class="lineNum">     391</span>                 :             :         listingId = createTestAuction(1, 0.05 ether, block.timestamp + 1 days);</span>
+<span id="L392"><span class="lineNum">     392</span>                 :             : </span>
+<span id="L393"><span class="lineNum">     393</span>                 :             :         //buy1出价</span>
+<span id="L394"><span class="lineNum">     394</span>                 :             :         uint previousBalance = buyer1.balance;//参与拍卖前的余额</span>
+<span id="L395"><span class="lineNum">     395</span>                 :             :         //console.log(&quot;buyer1 balance before bid: %s&quot;, previousBalance);</span>
+<span id="L396"><span class="lineNum">     396</span>                 :             :         vm.prank(buyer1);</span>
+<span id="L397"><span class="lineNum">     397</span>                 :             :         nftAuction.bidNFT{value: 0.06 ether}(listingId, 0.06 ether,address(0));</span>
+<span id="L398"><span class="lineNum">     398</span>                 :             :         uint currentBalance = buyer1.balance;</span>
+<span id="L399"><span class="lineNum">     399</span>                 :             :         //console.log(&quot;buyer1 balance after bid: %s&quot;, currentBalance);</span>
+<span id="L400"><span class="lineNum">     400</span>                 :             :         //console.log(&quot;buyer1 balance change: %s&quot;, previousBalance - currentBalance);</span>
+<span id="L401"><span class="lineNum">     401</span>                 :             :         assertEq(previousBalance , currentBalance + 0.06 ether);</span>
+<span id="L402"><span class="lineNum">     402</span>                 :             : </span>
+<span id="L403"><span class="lineNum">     403</span>                 :             :         //buy2出价</span>
+<span id="L404"><span class="lineNum">     404</span>                 :             :         vm.prank(buyer2);</span>
+<span id="L405"><span class="lineNum">     405</span>                 :             :         nftAuction.bidNFT{value: 0.07 ether}(listingId, 0.07 ether,address(0));</span>
+<span id="L406"><span class="lineNum">     406</span>                 :             :         uint finalBalance = buyer1.balance;</span>
+<span id="L407"><span class="lineNum">     407</span>                 :             :         //console.log(&quot;buyer1 balance after bid: %s&quot;, finalBalance);</span>
+<span id="L408"><span class="lineNum">     408</span>                 :             :         assertEq(finalBalance, previousBalance);</span>
+<span id="L409"><span class="lineNum">     409</span>                 :             :         </span>
+<span id="L410"><span class="lineNum">     410</span>                 :             :     }</span>
+<span id="L411"><span class="lineNum">     411</span>                 :             : </span>
+<span id="L412"><span class="lineNum">     412</span>                 :             :     //场景6：测试是否退还上一个最高出价者的出价（erc20结算）</span>
+<span id="L413"><span class="lineNum">     413</span>                 :             :     function test_CanRefundPreviousBidderERC20() public {</span>
+<span id="L414"><span class="lineNum">     414</span>                 :             :         //调用统一封装函数创建拍卖</span>
+<span id="L415"><span class="lineNum">     415</span>                 :             :         listingId = createTestAuction(1, 0.05 ether, block.timestamp + 1 days);</span>
+<span id="L416"><span class="lineNum">     416</span>                 :             :         </span>
+<span id="L417"><span class="lineNum">     417</span>                 :             :         //部署Mock ERC20代币合约</span>
+<span id="L418"><span class="lineNum">     418</span>                 :             :         mockToken = new MockERC20(&quot;MockToken&quot;, &quot;MTK&quot;, 1000000 * 10**18); </span>
+<span id="L419"><span class="lineNum">     419</span>                 :             :         // 创建价格预言机，设为1ETH per token</span>
+<span id="L420"><span class="lineNum">     420</span>                 :             :         MockV3Aggregator tokenPriceFeed2 = new MockV3Aggregator(1000000000000000000);</span>
+<span id="L421"><span class="lineNum">     421</span>                 :             :         vm.prank(owner);</span>
+<span id="L422"><span class="lineNum">     422</span>                 :             :         nftAuction.setPriceFeed(address(mockToken), address(tokenPriceFeed2));</span>
+<span id="L423"><span class="lineNum">     423</span>                 :             :         mockToken.transfer(buyer1, 100 * 10**18);</span>
+<span id="L424"><span class="lineNum">     424</span>                 :             :         //授权</span>
+<span id="L425"><span class="lineNum">     425</span>                 :             :         vm.startPrank(buyer1);</span>
+<span id="L426"><span class="lineNum">     426</span>                 :             :         mockToken.approve(address(nftAuction), 100 * 10**18);</span>
+<span id="L427"><span class="lineNum">     427</span>                 :             :         //出价</span>
+<span id="L428"><span class="lineNum">     428</span>                 :             :         uint previousBalance = mockToken.balanceOf(buyer1);</span>
+<span id="L429"><span class="lineNum">     429</span>                 :             :         console.log(&quot;buyer1 balance before bid: %s&quot;, previousBalance);</span>
+<span id="L430"><span class="lineNum">     430</span>                 :             :         nftAuction.bidNFT(listingId, 0.6 * 10**18, address(mockToken));</span>
+<span id="L431"><span class="lineNum">     431</span>                 :             :         uint currentBalance = mockToken.balanceOf(buyer1);</span>
+<span id="L432"><span class="lineNum">     432</span>                 :             :         console.log(&quot;buyer1 balance after bid: %s&quot;, currentBalance);</span>
+<span id="L433"><span class="lineNum">     433</span>                 :             :         assertEq(previousBalance, currentBalance + 0.6 * 10**18);</span>
+<span id="L434"><span class="lineNum">     434</span>                 :             :         vm.stopPrank();</span>
+<span id="L435"><span class="lineNum">     435</span>                 :             : </span>
+<span id="L436"><span class="lineNum">     436</span>                 :             :         mockToken.transfer(buyer2, 100 * 10**18);</span>
+<span id="L437"><span class="lineNum">     437</span>                 :             :         vm.startPrank(buyer2);</span>
+<span id="L438"><span class="lineNum">     438</span>                 :             :         mockToken.approve(address(nftAuction), 100 * 10**18);</span>
+<span id="L439"><span class="lineNum">     439</span>                 :             :         nftAuction.bidNFT(listingId, 0.7 * 10**18, address(mockToken));</span>
+<span id="L440"><span class="lineNum">     440</span>                 :             :         uint finalBalance = mockToken.balanceOf(buyer1);</span>
+<span id="L441"><span class="lineNum">     441</span>                 :             :         assertEq(finalBalance, previousBalance);</span>
+<span id="L442"><span class="lineNum">     442</span>                 :             :         vm.stopPrank();</span>
+<span id="L443"><span class="lineNum">     443</span>                 :             :     }</span>
+<span id="L444"><span class="lineNum">     444</span>                 :             : </span>
+<span id="L445"><span class="lineNum">     445</span>                 :             :     //场景7：测试对已经结束的拍卖出价</span>
+<span id="L446"><span class="lineNum">     446</span>                 :             :     function test_CannotPlaceBidAfterAuctionEnded() public { </span>
+<span id="L447"><span class="lineNum">     447</span>                 :             :         listingId = createTestAuction(1, 0.05 ether, block.timestamp + 1 days);</span>
+<span id="L448"><span class="lineNum">     448</span>                 :             :         vm.warp(block.timestamp + 2 days);</span>
+<span id="L449"><span class="lineNum">     449</span>                 :             :         vm.prank(seller);</span>
+<span id="L450"><span class="lineNum">     450</span>                 :             :         nftAuction.endAuction(listingId);</span>
+<span id="L451"><span class="lineNum">     451</span>                 :             :         vm.prank(buyer1);</span>
+<span id="L452"><span class="lineNum">     452</span>                 :             :         vm.expectRevert(&quot;Auction is not active&quot;);</span>
+<span id="L453"><span class="lineNum">     453</span>                 :             :         nftAuction.bidNFT{value: 0.06 ether}(listingId, 0.06 ether,address(0));</span>
+<span id="L454"><span class="lineNum">     454</span>                 :             :     }</span>
+<span id="L455"><span class="lineNum">     455</span>                 :             : </span>
+<span id="L456"><span class="lineNum">     456</span>                 :             :     //场景8 ：测试用例来测试ERC20转账失败的情况</span>
+<span id="L457"><span class="lineNum">     457</span>                 :             :     function test_BidNFTWithFailingERC20Transfer() public {</span>
+<span id="L458"><span class="lineNum">     458</span>                 :             : </span>
+<span id="L459"><span class="lineNum">     459</span>                 :             : </span>
+<span id="L460"><span class="lineNum">     460</span>                 :             :         // 创建一个正常的NFT</span>
+<span id="L461"><span class="lineNum">     461</span>                 :             :         vm.prank(seller);</span>
+<span id="L462"><span class="lineNum">     462</span>                 :             :         uint256 tokenId = nftContract.mint{value: 0.01 ether}(&quot;ipfs://test-metadata1&quot;);</span>
+<span id="L463"><span class="lineNum">     463</span>                 :             :         </span>
+<span id="L464"><span class="lineNum">     464</span>                 :             :         // 授权NFT给拍卖合约</span>
+<span id="L465"><span class="lineNum">     465</span>                 :             :         vm.prank(seller);</span>
+<span id="L466"><span class="lineNum">     466</span>                 :             :         nftContract.approve(address(nftAuction), tokenId);</span>
+<span id="L467"><span class="lineNum">     467</span>                 :             :         </span>
+<span id="L468"><span class="lineNum">     468</span>                 :             :         // 创建拍卖</span>
+<span id="L469"><span class="lineNum">     469</span>                 :             :         vm.prank(seller);</span>
+<span id="L470"><span class="lineNum">     470</span>                 :             :         uint256 auctionId = nftAuction.createAuction(</span>
+<span id="L471"><span class="lineNum">     471</span>                 :             :             address(nftContract),</span>
+<span id="L472"><span class="lineNum">     472</span>                 :             :             tokenId,</span>
+<span id="L473"><span class="lineNum">     473</span>                 :             :             0.1 ether,</span>
+<span id="L474"><span class="lineNum">     474</span>                 :             :             block.timestamp + 1 days</span>
+<span id="L475"><span class="lineNum">     475</span>                 :             :         );</span>
+<span id="L476"><span class="lineNum">     476</span>                 :             :         </span>
+<span id="L477"><span class="lineNum">     477</span>                 :             :         // 创建一个会故意失败的ERC20代币合约</span>
+<span id="L478"><span class="lineNum">     478</span>                 :             :         MockFailingERC20 failingToken = new MockFailingERC20(&quot;FailingToken&quot;, &quot;FAIL&quot;);</span>
+<span id="L479"><span class="lineNum">     479</span>                 :             :         failingToken.mint(buyer1, 100 ether);</span>
+<span id="L480"><span class="lineNum">     480</span>                 :             :         </span>
+<span id="L481"><span class="lineNum">     481</span>                 :             :         // 为这个ERC20代币设置价格馈送，使用模拟的价格馈送</span>
+<span id="L482"><span class="lineNum">     482</span>                 :             :         MockV3Aggregator mockPriceFeed = new MockV3Aggregator(2000000000000000000); // 0.2美元，假设</span>
+<span id="L483"><span class="lineNum">     483</span>                 :             :         vm.prank(owner);</span>
+<span id="L484"><span class="lineNum">     484</span>                 :             :         nftAuction.setPriceFeed(address(failingToken), address(mockPriceFeed));</span>
+<span id="L485"><span class="lineNum">     485</span>                 :             :         // 买家授权拍卖合约使用其代币</span>
+<span id="L486"><span class="lineNum">     486</span>                 :             :         vm.prank(buyer1);</span>
+<span id="L487"><span class="lineNum">     487</span>                 :             :         failingToken.approve(address(nftAuction), 100 ether);</span>
+<span id="L488"><span class="lineNum">     488</span>                 :             :     </span>
+<span id="L489"><span class="lineNum">     489</span>                 :             :         // 尝试出价，由于Mock合约中的特殊逻辑，这将失败</span>
+<span id="L490"><span class="lineNum">     490</span>                 :             :         vm.prank(buyer1);</span>
+<span id="L491"><span class="lineNum">     491</span>                 :             :         vm.expectRevert(&quot;ERC20 transfer to contracts failed&quot;);</span>
+<span id="L492"><span class="lineNum">     492</span>                 :             :         nftAuction.bidNFT(</span>
+<span id="L493"><span class="lineNum">     493</span>                 :             :             auctionId,</span>
+<span id="L494"><span class="lineNum">     494</span>                 :             :             0.7 ether,  // 这个金额会导致Mock合约返回false</span>
+<span id="L495"><span class="lineNum">     495</span>                 :             :             address(failingToken)</span>
+<span id="L496"><span class="lineNum">     496</span>                 :             :         );</span>
+<span id="L497"><span class="lineNum">     497</span>                 :             :     }</span>
+<span id="L498"><span class="lineNum">     498</span>                 :             : </span>
+<span id="L499"><span class="lineNum">     499</span>                 :             :     //场景9：测试ERC20代币退款失败的情况</span>
+<span id="L500"><span class="lineNum">     500</span>                 :             :     function test_RefundPreviousBidderERC20Fails() public {</span>
+<span id="L501"><span class="lineNum">     501</span>                 :             :         // 创建一个正常的NFT</span>
+<span id="L502"><span class="lineNum">     502</span>                 :             :         vm.prank(seller);</span>
+<span id="L503"><span class="lineNum">     503</span>                 :             :         uint256 tokenId = nftContract.mint{value: 0.01 ether}(&quot;ipfs://test-metadata23&quot;);</span>
+<span id="L504"><span class="lineNum">     504</span>                 :             :         </span>
+<span id="L505"><span class="lineNum">     505</span>                 :             :         // 授权NFT给拍卖合约</span>
+<span id="L506"><span class="lineNum">     506</span>                 :             :         vm.prank(seller);</span>
+<span id="L507"><span class="lineNum">     507</span>                 :             :         nftContract.approve(address(nftAuction), tokenId);</span>
+<span id="L508"><span class="lineNum">     508</span>                 :             :         </span>
+<span id="L509"><span class="lineNum">     509</span>                 :             :         // 创建拍卖</span>
+<span id="L510"><span class="lineNum">     510</span>                 :             :         vm.prank(seller);</span>
+<span id="L511"><span class="lineNum">     511</span>                 :             :         uint256 auctionId = nftAuction.createAuction(</span>
+<span id="L512"><span class="lineNum">     512</span>                 :             :             address(nftContract),</span>
+<span id="L513"><span class="lineNum">     513</span>                 :             :             tokenId,</span>
+<span id="L514"><span class="lineNum">     514</span>                 :             :             0.1 ether,</span>
+<span id="L515"><span class="lineNum">     515</span>                 :             :             block.timestamp + 1 days</span>
+<span id="L516"><span class="lineNum">     516</span>                 :             :         );</span>
+<span id="L517"><span class="lineNum">     517</span>                 :             :         </span>
+<span id="L518"><span class="lineNum">     518</span>                 :             :         // 创建一个会故意在退款时失败的ERC20代币合约</span>
+<span id="L519"><span class="lineNum">     519</span>                 :             :         MockRefundingFailingERC20 failingToken = new MockRefundingFailingERC20(&quot;FailingToken&quot;, &quot;FAIL&quot;);</span>
+<span id="L520"><span class="lineNum">     520</span>                 :             :         failingToken.mint(address(nftAuction), 100 ether); // 给拍卖合约一些代币用于退款</span>
+<span id="L521"><span class="lineNum">     521</span>                 :             :         failingToken.mint(buyer1, 100 ether);</span>
+<span id="L522"><span class="lineNum">     522</span>                 :             :         failingToken.mint(buyer2, 100 ether);</span>
+<span id="L523"><span class="lineNum">     523</span>                 :             :         </span>
+<span id="L524"><span class="lineNum">     524</span>                 :             :         // 为这个ERC20代币设置价格馈送</span>
+<span id="L525"><span class="lineNum">     525</span>                 :             :         MockV3Aggregator mockPriceFeed = new MockV3Aggregator(2000000000000000000); // 0.2美元，假设</span>
+<span id="L526"><span class="lineNum">     526</span>                 :             :         vm.prank(owner);</span>
+<span id="L527"><span class="lineNum">     527</span>                 :             :         nftAuction.setPriceFeed(address(failingToken), address(mockPriceFeed));</span>
+<span id="L528"><span class="lineNum">     528</span>                 :             :         </span>
+<span id="L529"><span class="lineNum">     529</span>                 :             :         // buyer1 授权拍卖合约使用其代币</span>
+<span id="L530"><span class="lineNum">     530</span>                 :             :         vm.prank(buyer1);</span>
+<span id="L531"><span class="lineNum">     531</span>                 :             :         failingToken.approve(address(nftAuction), 100 ether);</span>
+<span id="L532"><span class="lineNum">     532</span>                 :             :         </span>
+<span id="L533"><span class="lineNum">     533</span>                 :             :         // buyer1 出价</span>
+<span id="L534"><span class="lineNum">     534</span>                 :             :         vm.prank(buyer1);</span>
+<span id="L535"><span class="lineNum">     535</span>                 :             :         nftAuction.bidNFT(</span>
+<span id="L536"><span class="lineNum">     536</span>                 :             :             auctionId,</span>
+<span id="L537"><span class="lineNum">     537</span>                 :             :             0.2 ether,</span>
+<span id="L538"><span class="lineNum">     538</span>                 :             :             address(failingToken)</span>
+<span id="L539"><span class="lineNum">     539</span>                 :             :         );</span>
+<span id="L540"><span class="lineNum">     540</span>                 :             :         </span>
+<span id="L541"><span class="lineNum">     541</span>                 :             :         // buyer2 也授权拍卖合约使用其代币</span>
+<span id="L542"><span class="lineNum">     542</span>                 :             :         vm.prank(buyer2);</span>
+<span id="L543"><span class="lineNum">     543</span>                 :             :         failingToken.approve(address(nftAuction), 100 ether);</span>
+<span id="L544"><span class="lineNum">     544</span>                 :             :         </span>
+<span id="L545"><span class="lineNum">     545</span>                 :             :         // 设置退款失败标志</span>
+<span id="L546"><span class="lineNum">     546</span>                 :             :         vm.prank(address(nftAuction));</span>
+<span id="L547"><span class="lineNum">     547</span>                 :             :         failingToken.setPreviousBidder(buyer1);</span>
+<span id="L548"><span class="lineNum">     548</span>                 :             :         vm.prank(address(nftAuction));</span>
+<span id="L549"><span class="lineNum">     549</span>                 :             :         failingToken.setShouldFailOnRefund(true);</span>
+<span id="L550"><span class="lineNum">     550</span>                 :             :         </span>
+<span id="L551"><span class="lineNum">     551</span>                 :             :         // 尝试出价，这会导致在退款给buyer1时失败</span>
+<span id="L552"><span class="lineNum">     552</span>                 :             :         vm.prank(buyer2);</span>
+<span id="L553"><span class="lineNum">     553</span>                 :             :         vm.expectRevert(&quot;ERC20 transfer to bidder failed&quot;);</span>
+<span id="L554"><span class="lineNum">     554</span>                 :             :         nftAuction.bidNFT(</span>
+<span id="L555"><span class="lineNum">     555</span>                 :             :             auctionId,</span>
+<span id="L556"><span class="lineNum">     556</span>                 :             :             0.3 ether,  // 更高的出价，会触发对buyer1的退款</span>
+<span id="L557"><span class="lineNum">     557</span>                 :             :             address(failingToken)</span>
+<span id="L558"><span class="lineNum">     558</span>                 :             :         );</span>
+<span id="L559"><span class="lineNum">     559</span>                 :             :     }</span>
+<span id="L560"><span class="lineNum">     560</span>                 :             : </span>
+<span id="L561"><span class="lineNum">     561</span>                 :             :     </span>
+<span id="L562"><span class="lineNum">     562</span>                 :             : </span>
+<span id="L563"><span class="lineNum">     563</span>                 :             : </span>
+<span id="L564"><span class="lineNum">     564</span>                 :             : </span>
+<span id="L565"><span class="lineNum">     565</span>                 :             : </span>
+<span id="L566"><span class="lineNum">     566</span>                 :             :     /************测试出价end***********/</span>
+<span id="L567"><span class="lineNum">     567</span>                 :             : </span>
+<span id="L568"><span class="lineNum">     568</span>                 :             :     /************测试结束拍卖start**********/</span>
+<span id="L569"><span class="lineNum">     569</span>                 :             : </span>
+<span id="L570"><span class="lineNum">     570</span>                 :             :     // 场景1：参数正常且功能正常</span>
+<span id="L571"><span class="lineNum">     571</span>                 :             :     function test_CanEndAuction() public {</span>
+<span id="L572"><span class="lineNum">     572</span>                 :             :         //调用统一封装函数创建拍卖</span>
+<span id="L573"><span class="lineNum">     573</span>                 :             :         listingId = createTestAuction(1, 0.05 ether, block.timestamp + 1 days); </span>
+<span id="L574"><span class="lineNum">     574</span>                 :             : </span>
+<span id="L575"><span class="lineNum">     575</span>                 :             :         vm.prank(buyer1);</span>
+<span id="L576"><span class="lineNum">     576</span>                 :             :         nftAuction.bidNFT{value: 0.06 ether}(listingId, 0.06 ether,address(0));</span>
+<span id="L577"><span class="lineNum">     577</span>                 :             :         vm.warp(block.timestamp + 2 days);</span>
+<span id="L578"><span class="lineNum">     578</span>                 :             :         vm.prank(seller);</span>
+<span id="L579"><span class="lineNum">     579</span>                 :             :         uint sellerBalanceBefore = seller.balance;</span>
+<span id="L580"><span class="lineNum">     580</span>                 :             :         uint feeReceiverBalanceBefore = feeReceiver.balance;</span>
+<span id="L581"><span class="lineNum">     581</span>                 :             :         nftAuction.endAuction(listingId);</span>
+<span id="L582"><span class="lineNum">     582</span>                 :             :         uint sellerBalanceAfter = seller.balance;</span>
+<span id="L583"><span class="lineNum">     583</span>                 :             :         uint feeReceiverBalanceAfter = feeReceiver.balance;</span>
+<span id="L584"><span class="lineNum">     584</span>                 :             : </span>
+<span id="L585"><span class="lineNum">     585</span>                 :             :         // 验证拍卖结束</span>
+<span id="L586"><span class="lineNum">     586</span>                 :             :         (, , , , , , , bool ended ,) = nftAuction.getAuctions(listingId);</span>
+<span id="L587"><span class="lineNum">     587</span>                 :             :         assertFalse(ended);</span>
+<span id="L588"><span class="lineNum">     588</span>                 :             :         // 验证NFT转移</span>
+<span id="L589"><span class="lineNum">     589</span>                 :             :         assertEq(nftContract.ownerOf(1), buyer1);</span>
+<span id="L590"><span class="lineNum">     590</span>                 :             :         // 验证手续费结算</span>
+<span id="L591"><span class="lineNum">     591</span>                 :             :         assertEq(feeReceiverBalanceAfter, feeReceiverBalanceBefore +  (0.06 ether*0.025)); // 2.5%手续费</span>
+<span id="L592"><span class="lineNum">     592</span>                 :             :         // 验证出售价格结算</span>
+<span id="L593"><span class="lineNum">     593</span>                 :             :         assertEq(sellerBalanceAfter, sellerBalanceBefore + 0.06 ether - (0.06 ether*0.025));</span>
+<span id="L594"><span class="lineNum">     594</span>                 :             : </span>
+<span id="L595"><span class="lineNum">     595</span>                 :             :     }</span>
+<span id="L596"><span class="lineNum">     596</span>                 :             : </span>
+<span id="L597"><span class="lineNum">     597</span>                 :             :     // 场景2：测试非卖家结束拍卖shuo</span>
+<span id="L598"><span class="lineNum">     598</span>                 :             :     function test_CannotEndAuctionIfNotSeller() public {</span>
+<span id="L599"><span class="lineNum">     599</span>                 :             :         //调用统一封装函数创建拍卖</span>
+<span id="L600"><span class="lineNum">     600</span>                 :             :         listingId = createTestAuction(1, 0.05 ether, block.timestamp + 1 days); </span>
+<span id="L601"><span class="lineNum">     601</span>                 :             : </span>
+<span id="L602"><span class="lineNum">     602</span>                 :             :         vm.prank(buyer1);</span>
+<span id="L603"><span class="lineNum">     603</span>                 :             :         nftAuction.bidNFT{value: 0.06 ether}(listingId, 0.06 ether,address(0));</span>
+<span id="L604"><span class="lineNum">     604</span>                 :             :         vm.warp(block.timestamp + 2 days);</span>
+<span id="L605"><span class="lineNum">     605</span>                 :             :         vm.prank(buyer2);</span>
+<span id="L606"><span class="lineNum">     606</span>                 :             :         vm.expectRevert(&quot;You are not the seller&quot;);</span>
+<span id="L607"><span class="lineNum">     607</span>                 :             :         nftAuction.endAuction(listingId);</span>
+<span id="L608"><span class="lineNum">     608</span>                 :             :     }</span>
+<span id="L609"><span class="lineNum">     609</span>                 :             : </span>
+<span id="L610"><span class="lineNum">     610</span>                 :             :     // 场景3：测试拍卖未结束无法结束拍卖</span>
+<span id="L611"><span class="lineNum">     611</span>                 :             :     function test_CannotEndAuctionIfNotEnded() public {</span>
+<span id="L612"><span class="lineNum">     612</span>                 :             :         //调用统一封装函数创建拍卖</span>
+<span id="L613"><span class="lineNum">     613</span>                 :             :         listingId = createTestAuction(1, 0.05 ether, block.timestamp + 2 days); </span>
+<span id="L614"><span class="lineNum">     614</span>                 :             : </span>
+<span id="L615"><span class="lineNum">     615</span>                 :             :         vm.prank(buyer1);</span>
+<span id="L616"><span class="lineNum">     616</span>                 :             :         nftAuction.bidNFT{value: 0.06 ether}(listingId, 0.06 ether,address(0));</span>
+<span id="L617"><span class="lineNum">     617</span>                 :             :         vm.warp(block.timestamp + 1 days);</span>
+<span id="L618"><span class="lineNum">     618</span>                 :             :         vm.prank(seller);</span>
+<span id="L619"><span class="lineNum">     619</span>                 :             :         vm.expectRevert(&quot;Auction has not ended&quot;);</span>
+<span id="L620"><span class="lineNum">     620</span>                 :             :         nftAuction.endAuction(listingId);</span>
+<span id="L621"><span class="lineNum">     621</span>                 :             :         (, , , , , , , bool active ,) = nftAuction.getAuctions(listingId);</span>
+<span id="L622"><span class="lineNum">     622</span>                 :             :         assertTrue(active);</span>
+<span id="L623"><span class="lineNum">     623</span>                 :             :     }</span>
+<span id="L624"><span class="lineNum">     624</span>                 :             : </span>
+<span id="L625"><span class="lineNum">     625</span>                 :             :     //场景4：测试无人出价结束拍卖</span>
+<span id="L626"><span class="lineNum">     626</span>                 :             :     function test_CanEndAuctionWithoutBids() public {</span>
+<span id="L627"><span class="lineNum">     627</span>                 :             :         //调用统一封装函数创建拍卖</span>
+<span id="L628"><span class="lineNum">     628</span>                 :             :         listingId = createTestAuction(1, 0.05 ether, block.timestamp + 1 days); </span>
+<span id="L629"><span class="lineNum">     629</span>                 :             : </span>
+<span id="L630"><span class="lineNum">     630</span>                 :             :         vm.warp(block.timestamp + 2 days);</span>
+<span id="L631"><span class="lineNum">     631</span>                 :             :         vm.prank(seller);</span>
+<span id="L632"><span class="lineNum">     632</span>                 :             :         nftAuction.endAuction(listingId);</span>
+<span id="L633"><span class="lineNum">     633</span>                 :             : </span>
+<span id="L634"><span class="lineNum">     634</span>                 :             :         // 验证拍卖结束</span>
+<span id="L635"><span class="lineNum">     635</span>                 :             :         (, , , , , , , bool active ,) = nftAuction.getAuctions(listingId);</span>
+<span id="L636"><span class="lineNum">     636</span>                 :             :         assertFalse(active);</span>
+<span id="L637"><span class="lineNum">     637</span>                 :             :     }</span>
+<span id="L638"><span class="lineNum">     638</span>                 :             : </span>
+<span id="L639"><span class="lineNum">     639</span>                 :             :     //场景5：测试对已经结束的拍卖进行结束</span>
+<span id="L640"><span class="lineNum">     640</span>                 :             :     function test_CannotEndAuctionTwice() public {</span>
+<span id="L641"><span class="lineNum">     641</span>                 :             :         //调用统一封装函数创建拍卖</span>
+<span id="L642"><span class="lineNum">     642</span>                 :             :         listingId = createTestAuction(1, 0.05 ether, block.timestamp + 1 days); </span>
+<span id="L643"><span class="lineNum">     643</span>                 :             : </span>
+<span id="L644"><span class="lineNum">     644</span>                 :             :         vm.warp(block.timestamp + 2 days);</span>
+<span id="L645"><span class="lineNum">     645</span>                 :             :         vm.prank(seller);</span>
+<span id="L646"><span class="lineNum">     646</span>                 :             :         nftAuction.endAuction(listingId);</span>
+<span id="L647"><span class="lineNum">     647</span>                 :             :         vm.expectRevert(&quot;Auction is not active&quot;);</span>
+<span id="L648"><span class="lineNum">     648</span>                 :             :         nftAuction.endAuction(listingId);</span>
+<span id="L649"><span class="lineNum">     649</span>                 :             :     }</span>
+<span id="L650"><span class="lineNum">     650</span>                 :             : </span>
+<span id="L651"><span class="lineNum">     651</span>                 :             :     //场景6：测试结束拍卖的时候卖家已经取消对于合约的NFT授权</span>
+<span id="L652"><span class="lineNum">     652</span>                 :             :     function test_CanEndAuctionIfSellerRevokesApproval() public {</span>
+<span id="L653"><span class="lineNum">     653</span>                 :             :         //调用统一封装函数创建拍卖</span>
+<span id="L654"><span class="lineNum">     654</span>                 :             :         listingId = createTestAuction(1, 0.05 ether, block.timestamp + 1 days);</span>
+<span id="L655"><span class="lineNum">     655</span>                 :             :         vm.prank(seller);</span>
+<span id="L656"><span class="lineNum">     656</span>                 :             :         nftContract.approve(address(0), 1);</span>
+<span id="L657"><span class="lineNum">     657</span>                 :             :         vm.prank(buyer1);</span>
+<span id="L658"><span class="lineNum">     658</span>                 :             :         nftAuction.bidNFT{value: 0.06 ether}(listingId, 0.06 ether,address(0));</span>
+<span id="L659"><span class="lineNum">     659</span>                 :             :         vm.warp(block.timestamp + 2 days);</span>
+<span id="L660"><span class="lineNum">     660</span>                 :             :         vm.prank(seller);</span>
+<span id="L661"><span class="lineNum">     661</span>                 :             :         vm.expectRevert();</span>
+<span id="L662"><span class="lineNum">     662</span>                 :             :         nftAuction.endAuction(listingId);</span>
+<span id="L663"><span class="lineNum">     663</span>                 :             : </span>
+<span id="L664"><span class="lineNum">     664</span>                 :             :     }</span>
+<span id="L665"><span class="lineNum">     665</span>                 :             : </span>
+<span id="L666"><span class="lineNum">     666</span>                 :             :     //场景7：测试结束拍卖的时候手续费收益结算失败</span>
+<span id="L667"><span class="lineNum">     667</span>                 :             :     function test_CannotEndAuctionIfFeeTransferFails() public {</span>
+<span id="L668"><span class="lineNum">     668</span>                 :             :         // 创建一个会拒绝接收资金的feeReceiver</span>
+<span id="L669"><span class="lineNum">     669</span>                 :             :         RevertingReceiver revertingFeeReceiver = new RevertingReceiver();</span>
+<span id="L670"><span class="lineNum">     670</span>                 :             :         </span>
+<span id="L671"><span class="lineNum">     671</span>                 :             :         // 重新部署合约并使用拒绝接收资金的地址作为feeReceiver</span>
+<span id="L672"><span class="lineNum">     672</span>                 :             :         NFTAuction revertingNftAuction = new NFTAuction();</span>
+<span id="L673"><span class="lineNum">     673</span>                 :             :         revertingNftAuction.initialize(address(revertingFeeReceiver));</span>
+<span id="L674"><span class="lineNum">     674</span>                 :             :         </span>
+<span id="L675"><span class="lineNum">     675</span>                 :             :         // 设置价格预言机</span>
+<span id="L676"><span class="lineNum">     676</span>                 :             :         MockV3Aggregator ethPriceFeedNew = new MockV3Aggregator(2000000000000000000);</span>
+<span id="L677"><span class="lineNum">     677</span>                 :             :         revertingNftAuction.setPriceFeed(address(0), address(ethPriceFeedNew));</span>
+<span id="L678"><span class="lineNum">     678</span>                 :             :         </span>
+<span id="L679"><span class="lineNum">     679</span>                 :             :         // 账户资金初始化</span>
+<span id="L680"><span class="lineNum">     680</span>                 :             :         vm.deal(seller, 100 ether);</span>
+<span id="L681"><span class="lineNum">     681</span>                 :             :         vm.deal(buyer1, 100 ether);</span>
+<span id="L682"><span class="lineNum">     682</span>                 :             :         </span>
+<span id="L683"><span class="lineNum">     683</span>                 :             :         // 给seller账户提供NFT合约地址和tokenId</span>
+<span id="L684"><span class="lineNum">     684</span>                 :             :         NFThan nftContractLocal = new NFThan(&quot;TestNFT&quot;, &quot;TNFT&quot;);</span>
+<span id="L685"><span class="lineNum">     685</span>                 :             :         vm.prank(seller);</span>
+<span id="L686"><span class="lineNum">     686</span>                 :             :         uint tokenId = nftContractLocal.mint{value: 0.01 ether}(&quot;ipfs://test-metadata&quot;);</span>
+<span id="L687"><span class="lineNum">     687</span>                 :             : </span>
+<span id="L688"><span class="lineNum">     688</span>                 :             :         // seller批准NFT拍卖合约可以操作其NFT</span>
+<span id="L689"><span class="lineNum">     689</span>                 :             :         vm.prank(seller);</span>
+<span id="L690"><span class="lineNum">     690</span>                 :             :         nftContractLocal.approve(address(revertingNftAuction), tokenId);</span>
+<span id="L691"><span class="lineNum">     691</span>                 :             : </span>
+<span id="L692"><span class="lineNum">     692</span>                 :             :         // 创建拍卖</span>
+<span id="L693"><span class="lineNum">     693</span>                 :             :         vm.prank(seller);</span>
+<span id="L694"><span class="lineNum">     694</span>                 :             :         uint auctionId = revertingNftAuction.createAuction(</span>
+<span id="L695"><span class="lineNum">     695</span>                 :             :             address(nftContractLocal),</span>
+<span id="L696"><span class="lineNum">     696</span>                 :             :             tokenId,</span>
+<span id="L697"><span class="lineNum">     697</span>                 :             :             0.05 ether,</span>
+<span id="L698"><span class="lineNum">     698</span>                 :             :             block.timestamp + 1 days</span>
+<span id="L699"><span class="lineNum">     699</span>                 :             :         );</span>
+<span id="L700"><span class="lineNum">     700</span>                 :             : </span>
+<span id="L701"><span class="lineNum">     701</span>                 :             :         // 有人出价</span>
+<span id="L702"><span class="lineNum">     702</span>                 :             :         vm.prank(buyer1);</span>
+<span id="L703"><span class="lineNum">     703</span>                 :             :         revertingNftAuction.bidNFT{value: 0.06 ether}(auctionId, 0.06 ether, address(0));</span>
+<span id="L704"><span class="lineNum">     704</span>                 :             : </span>
+<span id="L705"><span class="lineNum">     705</span>                 :             :         // 时间快进到拍卖结束后</span>
+<span id="L706"><span class="lineNum">     706</span>                 :             :         vm.warp(block.timestamp + 2 days);</span>
+<span id="L707"><span class="lineNum">     707</span>                 :             : </span>
+<span id="L708"><span class="lineNum">     708</span>                 :             :         // 尝试结束拍卖，应该因为向feeReceiver转账失败而失败</span>
+<span id="L709"><span class="lineNum">     709</span>                 :             :         vm.prank(seller);</span>
+<span id="L710"><span class="lineNum">     710</span>                 :             :         vm.expectRevert(&quot;Failed to send fee.&quot;);</span>
+<span id="L711"><span class="lineNum">     711</span>                 :             :         revertingNftAuction.endAuction(auctionId);</span>
+<span id="L712"><span class="lineNum">     712</span>                 :             :     }</span>
+<span id="L713"><span class="lineNum">     713</span>                 :             : </span>
+<span id="L714"><span class="lineNum">     714</span>                 :             : </span>
+<span id="L715"><span class="lineNum">     715</span>                 :             :     </span>
+<span id="L716"><span class="lineNum">     716</span>                 :             :   </span>
+<span id="L717"><span class="lineNum">     717</span>                 :             :     /************测试结束拍卖end************/</span>
+<span id="L718"><span class="lineNum">     718</span>                 :             : </span>
+<span id="L719"><span class="lineNum">     719</span>                 :             :     /************测试升级合约start**********/</span>
+<span id="L720"><span class="lineNum">     720</span>                 :             : </span>
+<span id="L721"><span class="lineNum">     721</span>                 :             :     </span>
+<span id="L722"><span class="lineNum">     722</span>                 :             :     /************测试升级合约end**********/</span>
+<span id="L723"><span class="lineNum">     723</span>                 :             : </span>
+<span id="L724"><span class="lineNum">     724</span>                 :             : </span>
+<span id="L725"><span class="lineNum">     725</span>                 :             :     // 测试预言机功能</span>
+<span id="L726"><span class="lineNum">     726</span>                 :             :     function test_CanSetAndGetPriceFeed() public {</span>
+<span id="L727"><span class="lineNum">     727</span>                 :             :         address tokenAddr = address(0x123);</span>
+<span id="L728"><span class="lineNum">     728</span>                 :             :         MockV3Aggregator newPriceFeed = new MockV3Aggregator(1500000000000000000); // 1500 USD</span>
+<span id="L729"><span class="lineNum">     729</span>                 :             :         </span>
+<span id="L730"><span class="lineNum">     730</span>                 :             :         vm.prank(owner);</span>
+<span id="L731"><span class="lineNum">     731</span>                 :             :         nftAuction.setPriceFeed(tokenAddr, address(newPriceFeed));</span>
+<span id="L732"><span class="lineNum">     732</span>                 :             :         </span>
+<span id="L733"><span class="lineNum">     733</span>                 :             :         int price = nftAuction.getChainlinkDataFeedLatestAnswer(tokenAddr);</span>
+<span id="L734"><span class="lineNum">     734</span>                 :             :         assertEq(price, 1500000000000000000);</span>
+<span id="L735"><span class="lineNum">     735</span>                 :             :     }</span>
+<span id="L736"><span class="lineNum">     736</span>                 :             : </span>
+<span id="L737"><span class="lineNum">     737</span>                 :             :     // 辅助函数：创建拍卖</span>
+<span id="L738"><span class="lineNum">     738</span>                 :             :     function createTestAuction(uint tokenId, uint startPrice, uint endTime) internal returns (uint) {</span>
+<span id="L739"><span class="lineNum">     739</span>                 :             :         vm.prank(seller);</span>
+<span id="L740"><span class="lineNum">     740</span>                 :             :         uint id = nftAuction.createAuction(</span>
+<span id="L741"><span class="lineNum">     741</span>                 :             :             address(nftContract),</span>
+<span id="L742"><span class="lineNum">     742</span>                 :             :             tokenId,</span>
+<span id="L743"><span class="lineNum">     743</span>                 :             :             startPrice,</span>
+<span id="L744"><span class="lineNum">     744</span>                 :             :             endTime</span>
+<span id="L745"><span class="lineNum">     745</span>                 :             :         );</span>
+<span id="L746"><span class="lineNum">     746</span>                 :             :         </span>
+<span id="L747"><span class="lineNum">     747</span>                 :             :         (address r_seller, address r_nftContract, uint r_tokenId, uint r_start_price, uint r_end_time, , , ,) = nftAuction.getAuctions(id);</span>
+<span id="L748"><span class="lineNum">     748</span>                 :             :         assertEq(seller, r_seller);</span>
+<span id="L749"><span class="lineNum">     749</span>                 :             :         assertEq(address(nftContract), address(r_nftContract));</span>
+<span id="L750"><span class="lineNum">     750</span>                 :             :         assertEq(r_tokenId, tokenId);</span>
+<span id="L751"><span class="lineNum">     751</span>                 :             :         assertEq(r_start_price, startPrice);</span>
+<span id="L752"><span class="lineNum">     752</span>                 :             :         assertEq(r_end_time, endTime);</span>
+<span id="L753"><span class="lineNum">     753</span>                 :             :         assertTrue(nftAuction.getAuctionCount() &gt; 0);</span>
+<span id="L754"><span class="lineNum">     754</span>                 :             :         </span>
+<span id="L755"><span class="lineNum">     755</span>                 :             :         return id;</span>
+<span id="L756"><span class="lineNum">     756</span>                 :             :     }</span>
+<span id="L757"><span class="lineNum">     757</span>                 :             : </span>
+<span id="L758"><span class="lineNum">     758</span>                 :             :     // 测试：价格预言机不存在时的行为</span>
+<span id="L759"><span class="lineNum">     759</span>                 :             :     function test_BidWithNonExistentPriceFeed() public {</span>
+<span id="L760"><span class="lineNum">     760</span>                 :             :         listingId = createTestAuction(1, 0.05 ether, block.timestamp + 1 days);</span>
+<span id="L761"><span class="lineNum">     761</span>                 :             :         </span>
+<span id="L762"><span class="lineNum">     762</span>                 :             :         // 尝试使用未设置的价格预言机</span>
+<span id="L763"><span class="lineNum">     763</span>                 :             :         address nonExistentToken = address(0x999);</span>
+<span id="L764"><span class="lineNum">     764</span>                 :             :         </span>
+<span id="L765"><span class="lineNum">     765</span>                 :             :         vm.prank(buyer1);</span>
+<span id="L766"><span class="lineNum">     766</span>                 :             :         vm.expectRevert();</span>
+<span id="L767"><span class="lineNum">     767</span>                 :             :         nftAuction.bidNFT{value: 0.06 ether}(listingId, 0.06 ether, nonExistentToken);</span>
+<span id="L768"><span class="lineNum">     768</span>                 :             :     }</span>
+<span id="L769"><span class="lineNum">     769</span>                 :             : </span>
+<span id="L770"><span class="lineNum">     770</span>                 :             :     </span>
+<span id="L771"><span class="lineNum">     771</span>                 :             : </span>
+<span id="L772"><span class="lineNum">     772</span>                 :             : </span>
+<span id="L773"><span class="lineNum">     773</span>                 :             : }</span>
+<span id="L774"><span class="lineNum">     774</span>                 :             : </span>
+<span id="L775"><span class="lineNum">     775</span>                 :             : // Mock ERC20 Token Contract</span>
+<span id="L776"><span class="lineNum">     776</span>                 :             : contract MockERC20 {</span>
+<span id="L777"><span class="lineNum">     777</span>                 :             :     string public name;</span>
+<span id="L778"><span class="lineNum">     778</span>                 :             :     string public symbol;</span>
+<span id="L779"><span class="lineNum">     779</span>                 :             :     uint8 public decimals;</span>
+<span id="L780"><span class="lineNum">     780</span>                 :             :     uint public totalSupply;</span>
+<span id="L781"><span class="lineNum">     781</span>                 :             :     mapping(address =&gt; uint) public balanceOf;</span>
+<span id="L782"><span class="lineNum">     782</span>                 :             :     mapping(address =&gt; mapping(address =&gt; uint)) public allowance;</span>
+<span id="L783"><span class="lineNum">     783</span>                 :             : </span>
+<span id="L784"><span class="lineNum">     784</span>                 :             :     event Transfer(address indexed from, address indexed to, uint value);</span>
+<span id="L785"><span class="lineNum">     785</span>                 :             :     event Approval(address indexed owner, address indexed spender, uint value);</span>
+<span id="L786"><span class="lineNum">     786</span>                 :             : </span>
+<span id="L787"><span class="lineNum">     787</span>                 :<span class="tlaGNC">           4 :     constructor(string memory _name, string memory _symbol, uint _totalSupply) {</span></span>
+<span id="L788"><span class="lineNum">     788</span>                 :<span class="tlaGNC">           4 :         name = _name;</span></span>
+<span id="L789"><span class="lineNum">     789</span>                 :<span class="tlaGNC">           4 :         symbol = _symbol;</span></span>
+<span id="L790"><span class="lineNum">     790</span>                 :<span class="tlaGNC">           4 :         decimals = 18;</span></span>
+<span id="L791"><span class="lineNum">     791</span>                 :<span class="tlaGNC">           4 :         totalSupply = _totalSupply;</span></span>
+<span id="L792"><span class="lineNum">     792</span>                 :<span class="tlaGNC">           4 :         balanceOf[msg.sender] = _totalSupply;</span></span>
+<span id="L793"><span class="lineNum">     793</span>                 :             :     }</span>
+<span id="L794"><span class="lineNum">     794</span>                 :             : </span>
+<span id="L795"><span class="lineNum">     795</span>                 :<span class="tlaGNC">           6 :     function transfer(address to, uint value) public returns (bool) {</span></span>
+<span id="L796"><span class="lineNum">     796</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaGBC" title="Branch 1 was taken 6 times"> + </span>]:<span class="tlaGNC">           6 :         require(balanceOf[msg.sender] &gt;= value, &quot;Insufficient balance&quot;);</span></span>
+<span id="L797"><span class="lineNum">     797</span>                 :<span class="tlaGNC">           6 :         balanceOf[msg.sender] -= value;</span></span>
+<span id="L798"><span class="lineNum">     798</span>                 :<span class="tlaGNC">           6 :         balanceOf[to] += value;</span></span>
+<span id="L799"><span class="lineNum">     799</span>                 :<span class="tlaGNC">           6 :         emit Transfer(msg.sender, to, value);</span></span>
+<span id="L800"><span class="lineNum">     800</span>                 :<span class="tlaGNC">           6 :         return true;</span></span>
+<span id="L801"><span class="lineNum">     801</span>                 :             :     }</span>
+<span id="L802"><span class="lineNum">     802</span>                 :             : </span>
+<span id="L803"><span class="lineNum">     803</span>                 :<span class="tlaGNC">           5 :     function approve(address spender, uint value) public returns (bool) {</span></span>
+<span id="L804"><span class="lineNum">     804</span>                 :<span class="tlaGNC">           5 :         allowance[msg.sender][spender] = value;</span></span>
+<span id="L805"><span class="lineNum">     805</span>                 :<span class="tlaGNC">           5 :         emit Approval(msg.sender, spender, value);</span></span>
+<span id="L806"><span class="lineNum">     806</span>                 :<span class="tlaGNC">           5 :         return true;</span></span>
+<span id="L807"><span class="lineNum">     807</span>                 :             :     }</span>
+<span id="L808"><span class="lineNum">     808</span>                 :             : </span>
+<span id="L809"><span class="lineNum">     809</span>                 :<span class="tlaGNC">           4 :     function transferFrom(address from, address to, uint value) public returns (bool) {</span></span>
+<span id="L810"><span class="lineNum">     810</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 3 times"> + </span>]:<span class="tlaGNC">           4 :         require(balanceOf[from] &gt;= value, &quot;Insufficient balance&quot;);</span></span>
+<span id="L811"><span class="lineNum">     811</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaGBC" title="Branch 1 was taken 3 times"> + </span>]:<span class="tlaGNC">           3 :         require(allowance[from][msg.sender] &gt;= value, &quot;Allowance exceeded&quot;);</span></span>
+<span id="L812"><span class="lineNum">     812</span>                 :<span class="tlaGNC">           3 :         balanceOf[from] -= value;</span></span>
+<span id="L813"><span class="lineNum">     813</span>                 :<span class="tlaGNC">           3 :         balanceOf[to] += value;</span></span>
+<span id="L814"><span class="lineNum">     814</span>                 :<span class="tlaGNC">           3 :         allowance[from][msg.sender] -= value;</span></span>
+<span id="L815"><span class="lineNum">     815</span>                 :<span class="tlaGNC">           3 :         emit Transfer(from, to, value);</span></span>
+<span id="L816"><span class="lineNum">     816</span>                 :<span class="tlaGNC">           3 :         return true;</span></span>
+<span id="L817"><span class="lineNum">     817</span>                 :             :     }</span>
+<span id="L818"><span class="lineNum">     818</span>                 :             : }</span>
+<span id="L819"><span class="lineNum">     819</span>                 :             : </span>
+<span id="L820"><span class="lineNum">     820</span>                 :             : // Mock ERC20合约用于测试转账失败的情况</span>
+<span id="L821"><span class="lineNum">     821</span>                 :             : contract MockFailingERC20 {</span>
+<span id="L822"><span class="lineNum">     822</span>                 :             :     string public name;</span>
+<span id="L823"><span class="lineNum">     823</span>                 :             :     string public symbol;</span>
+<span id="L824"><span class="lineNum">     824</span>                 :             :     uint8 public decimals;</span>
+<span id="L825"><span class="lineNum">     825</span>                 :             :     mapping(address =&gt; uint256) public balanceOf;</span>
+<span id="L826"><span class="lineNum">     826</span>                 :             :     mapping(address =&gt; mapping(address =&gt; uint256)) public allowance;</span>
+<span id="L827"><span class="lineNum">     827</span>                 :             : </span>
+<span id="L828"><span class="lineNum">     828</span>                 :<span class="tlaGNC">           1 :     constructor(string memory _name, string memory _symbol) {</span></span>
+<span id="L829"><span class="lineNum">     829</span>                 :<span class="tlaGNC">           1 :         name = _name;</span></span>
+<span id="L830"><span class="lineNum">     830</span>                 :<span class="tlaGNC">           1 :         symbol = _symbol;</span></span>
+<span id="L831"><span class="lineNum">     831</span>                 :<span class="tlaGNC">           1 :         decimals = 18;</span></span>
+<span id="L832"><span class="lineNum">     832</span>                 :             :     }</span>
+<span id="L833"><span class="lineNum">     833</span>                 :             : </span>
+<span id="L834"><span class="lineNum">     834</span>                 :<span class="tlaGNC">           1 :     function mint(address to, uint256 amount) public {</span></span>
+<span id="L835"><span class="lineNum">     835</span>                 :<span class="tlaGNC">           1 :         balanceOf[to] += amount;</span></span>
+<span id="L836"><span class="lineNum">     836</span>                 :             :     }</span>
+<span id="L837"><span class="lineNum">     837</span>                 :             : </span>
+<span id="L838"><span class="lineNum">     838</span>                 :<span class="tlaGNC">           1 :     function approve(address spender, uint256 amount) public returns (bool) {</span></span>
+<span id="L839"><span class="lineNum">     839</span>                 :<span class="tlaGNC">           1 :         allowance[msg.sender][spender] = amount;</span></span>
+<span id="L840"><span class="lineNum">     840</span>                 :<span class="tlaGNC">           1 :         return true;</span></span>
+<span id="L841"><span class="lineNum">     841</span>                 :             :     }</span>
+<span id="L842"><span class="lineNum">     842</span>                 :             : </span>
+<span id="L843"><span class="lineNum">     843</span>                 :<span class="tlaGNC">           1 :     function transferFrom(address from, address to, uint256 amount) public returns (bool) {</span></span>
+<span id="L844"><span class="lineNum">     844</span>                 :             :         // 故意让转账失败的条件，例如当from地址余额不足时</span>
+<span id="L845"><span class="lineNum">     845</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>]:<span class="tlaGNC">           1 :         require(balanceOf[from] &gt;= amount, &quot;Insufficient balance&quot;);</span></span>
+<span id="L846"><span class="lineNum">     846</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaGBC" title="Branch 1 was taken 1 time"> + </span>]:<span class="tlaGNC">           1 :         require(allowance[from][msg.sender] &gt;= amount, &quot;Insufficient allowance&quot;);</span></span>
+<span id="L847"><span class="lineNum">     847</span>                 :             :         </span>
+<span id="L848"><span class="lineNum">     848</span>                 :             :         // 根据某些条件故意使转账失败</span>
+<span id="L849"><span class="lineNum">     849</span>                 :             :         // 根据特定金额故意使转账失败</span>
+<span id="L850"><span class="lineNum">     850</span>            [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span>]:<span class="tlaGNC">           1 :         if (amount == 0.7 ether) {  // 0.7 * 10**18 = 700000000000000000</span></span>
+<span id="L851"><span class="lineNum">     851</span>                 :<span class="tlaGNC">           1 :             return false;</span></span>
+<span id="L852"><span class="lineNum">     852</span>                 :             :         }</span>
+<span id="L853"><span class="lineNum">     853</span>                 :             :         </span>
+<span id="L854"><span class="lineNum">     854</span>                 :<span class="tlaUNC">           0 :         balanceOf[from] -= amount;</span></span>
+<span id="L855"><span class="lineNum">     855</span>                 :<span class="tlaUNC">           0 :         balanceOf[to] += amount;</span></span>
+<span id="L856"><span class="lineNum">     856</span>                 :<span class="tlaUNC">           0 :         allowance[from][msg.sender] -= amount;</span></span>
+<span id="L857"><span class="lineNum">     857</span>                 :<span class="tlaUNC">           0 :         return true;</span></span>
+<span id="L858"><span class="lineNum">     858</span>                 :             :     }</span>
+<span id="L859"><span class="lineNum">     859</span>                 :             : }</span>
+<span id="L860"><span class="lineNum">     860</span>                 :             : </span>
+<span id="L861"><span class="lineNum">     861</span>                 :             : contract MockRefundingFailingERC20 {</span>
+<span id="L862"><span class="lineNum">     862</span>                 :             :     string public name;</span>
+<span id="L863"><span class="lineNum">     863</span>                 :             :     string public symbol;</span>
+<span id="L864"><span class="lineNum">     864</span>                 :             :     uint8 public decimals;</span>
+<span id="L865"><span class="lineNum">     865</span>                 :             :     mapping(address =&gt; uint256) public balanceOf;</span>
+<span id="L866"><span class="lineNum">     866</span>                 :             :     mapping(address =&gt; mapping(address =&gt; uint256)) public allowance;</span>
+<span id="L867"><span class="lineNum">     867</span>                 :             :     </span>
+<span id="L868"><span class="lineNum">     868</span>                 :             :     // 记录谁是前一个最高出价者，以便在退款时模拟失败</span>
+<span id="L869"><span class="lineNum">     869</span>                 :             :     address public previousBidder;</span>
+<span id="L870"><span class="lineNum">     870</span>                 :             :     bool public shouldFailOnRefund = false;</span>
+<span id="L871"><span class="lineNum">     871</span>                 :             : </span>
+<span id="L872"><span class="lineNum">     872</span>                 :<span class="tlaGNC">           1 :     constructor(string memory _name, string memory _symbol) {</span></span>
+<span id="L873"><span class="lineNum">     873</span>                 :<span class="tlaGNC">           1 :         name = _name;</span></span>
+<span id="L874"><span class="lineNum">     874</span>                 :<span class="tlaGNC">           1 :         symbol = _symbol;</span></span>
+<span id="L875"><span class="lineNum">     875</span>                 :<span class="tlaGNC">           1 :         decimals = 18;</span></span>
+<span id="L876"><span class="lineNum">     876</span>                 :             :     }</span>
+<span id="L877"><span class="lineNum">     877</span>                 :             : </span>
+<span id="L878"><span class="lineNum">     878</span>                 :<span class="tlaGNC">           3 :     function mint(address to, uint256 amount) public {</span></span>
+<span id="L879"><span class="lineNum">     879</span>                 :<span class="tlaGNC">           3 :         balanceOf[to] += amount;</span></span>
+<span id="L880"><span class="lineNum">     880</span>                 :             :     }</span>
+<span id="L881"><span class="lineNum">     881</span>                 :             : </span>
+<span id="L882"><span class="lineNum">     882</span>                 :<span class="tlaGNC">           2 :     function approve(address spender, uint256 amount) public returns (bool) {</span></span>
+<span id="L883"><span class="lineNum">     883</span>                 :<span class="tlaGNC">           2 :         allowance[msg.sender][spender] = amount;</span></span>
+<span id="L884"><span class="lineNum">     884</span>                 :<span class="tlaGNC">           2 :         return true;</span></span>
+<span id="L885"><span class="lineNum">     885</span>                 :             :     }</span>
+<span id="L886"><span class="lineNum">     886</span>                 :             : </span>
+<span id="L887"><span class="lineNum">     887</span>                 :<span class="tlaGNC">           2 :     function transferFrom(address from, address to, uint256 amount) public returns (bool) {</span></span>
+<span id="L888"><span class="lineNum">     888</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaGBC" title="Branch 1 was taken 2 times"> + </span>]:<span class="tlaGNC">           2 :         require(balanceOf[from] &gt;= amount, &quot;Insufficient balance&quot;);</span></span>
+<span id="L889"><span class="lineNum">     889</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaGBC" title="Branch 1 was taken 2 times"> + </span>]:<span class="tlaGNC">           2 :         require(allowance[from][msg.sender] &gt;= amount, &quot;Insufficient allowance&quot;);</span></span>
+<span id="L890"><span class="lineNum">     890</span>                 :             : </span>
+<span id="L891"><span class="lineNum">     891</span>                 :<span class="tlaGNC">           2 :         balanceOf[from] -= amount;</span></span>
+<span id="L892"><span class="lineNum">     892</span>                 :<span class="tlaGNC">           2 :         balanceOf[to] += amount;</span></span>
+<span id="L893"><span class="lineNum">     893</span>                 :<span class="tlaGNC">           2 :         allowance[from][msg.sender] -= amount;</span></span>
+<span id="L894"><span class="lineNum">     894</span>                 :<span class="tlaGNC">           2 :         return true;</span></span>
+<span id="L895"><span class="lineNum">     895</span>                 :             :     }</span>
+<span id="L896"><span class="lineNum">     896</span>                 :             : </span>
+<span id="L897"><span class="lineNum">     897</span>                 :             :     // 重写transfer函数，当退款给前一个最高出价者时故意失败</span>
+<span id="L898"><span class="lineNum">     898</span>                 :<span class="tlaGNC">           1 :     function transfer(address to, uint256 amount) public returns (bool) {</span></span>
+<span id="L899"><span class="lineNum">     899</span>                 :             :         // 如果是向之前的出价者转账且设置了退款失败标志，则失败</span>
+<span id="L900"><span class="lineNum">     900</span>            [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span>]:<span class="tlaGNC">           1 :         if (shouldFailOnRefund &amp;&amp; to == previousBidder) {</span></span>
+<span id="L901"><span class="lineNum">     901</span>                 :<span class="tlaGNC">           1 :             return false;</span></span>
+<span id="L902"><span class="lineNum">     902</span>                 :             :         }</span>
+<span id="L903"><span class="lineNum">     903</span>                 :             :         </span>
+<span id="L904"><span class="lineNum">     904</span>         [<span class="tlaUNC" title="Branch 0 was not executed"> # </span><span class="tlaUNC" title="Branch 1 was not executed"> # </span>]:<span class="tlaUNC">           0 :         require(balanceOf[msg.sender] &gt;= amount, &quot;Insufficient balance&quot;);</span></span>
+<span id="L905"><span class="lineNum">     905</span>                 :<span class="tlaUNC">           0 :         balanceOf[msg.sender] -= amount;</span></span>
+<span id="L906"><span class="lineNum">     906</span>                 :<span class="tlaUNC">           0 :         balanceOf[to] += amount;</span></span>
+<span id="L907"><span class="lineNum">     907</span>                 :<span class="tlaUNC">           0 :         return true;</span></span>
+<span id="L908"><span class="lineNum">     908</span>                 :             :     }</span>
+<span id="L909"><span class="lineNum">     909</span>                 :             :     </span>
+<span id="L910"><span class="lineNum">     910</span>                 :             :     // 设置前出价者地址</span>
+<span id="L911"><span class="lineNum">     911</span>                 :<span class="tlaGNC">           1 :     function setPreviousBidder(address _previousBidder) external {</span></span>
+<span id="L912"><span class="lineNum">     912</span>                 :<span class="tlaGNC">           1 :         previousBidder = _previousBidder;</span></span>
+<span id="L913"><span class="lineNum">     913</span>                 :             :     }</span>
+<span id="L914"><span class="lineNum">     914</span>                 :             :     </span>
+<span id="L915"><span class="lineNum">     915</span>                 :             :     // 设置是否在退款时失败</span>
+<span id="L916"><span class="lineNum">     916</span>                 :<span class="tlaGNC">           1 :     function setShouldFailOnRefund(bool _shouldFail) external {</span></span>
+<span id="L917"><span class="lineNum">     917</span>                 :<span class="tlaGNC">           1 :         shouldFailOnRefund = _shouldFail;</span></span>
+<span id="L918"><span class="lineNum">     918</span>                 :             :     }</span>
+<span id="L919"><span class="lineNum">     919</span>                 :             : }</span>
+<span id="L920"><span class="lineNum">     920</span>                 :             : </span>
+<span id="L921"><span class="lineNum">     921</span>                 :             : // 一个会拒绝接收资金的合约，用于测试转账失败的情况</span>
+<span id="L922"><span class="lineNum">     922</span>                 :             : contract RevertingReceiver {</span>
+<span id="L923"><span class="lineNum">     923</span>                 :<span class="tlaGNC">           1 :     receive() external payable {</span></span>
+<span id="L924"><span class="lineNum">     924</span>                 :<span class="tlaGNC">           1 :         revert(&quot;RevertingReceiver: Reverting on receive&quot;);</span></span>
+<span id="L925"><span class="lineNum">     925</span>                 :             :     }</span>
+<span id="L926"><span class="lineNum">     926</span>                 :             :     </span>
+<span id="L927"><span class="lineNum">     927</span>                 :<span class="tlaUNC">           0 :     fallback() external payable {</span></span>
+<span id="L928"><span class="lineNum">     928</span>                 :<span class="tlaUNC">           0 :         revert(&quot;RevertingReceiver: Reverting on fallback&quot;);</span></span>
+<span id="L929"><span class="lineNum">     929</span>                 :             :     }</span>
+<span id="L930"><span class="lineNum">     930</span>                 :             : }</span>
+<span id="L931"><span class="lineNum">     931</span>                 :             : </span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.4-2.gfa6c210</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>

@@ -1,0 +1,217 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - lcov.info - test/TokenVault.t.sol</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="title">LCOV - code coverage report</td></tr>
+            <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+            <tr>
+              <td width="100%">
+                <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="10%" class="headerValue"><a href="../index.html" title="Click to go to top-level">top level</a> - <a href="index.html" title="Click to go to directory test">test</a> - TokenVault.t.sol<span style="font-size: 80%;"> (source / <a href="TokenVault.t.sol.func-c.html" title="Click to go to function table">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="5%"></td>
+            <td width="5%" class="headerCovTableHead">Coverage</td>
+            <td width="5%" class="headerCovTableHead" title="Covered + Uncovered code">Total</td>
+            <td width="5%" class="headerCovTableHead" title="Exercised code only">Hit</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">lcov.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">4</td>
+            <td class="headerCovTableEntry">4</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test Date:</td>
+            <td class="headerValue">2026-01-12 16:53:21</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntry">2</td>
+          </tr>
+                  <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+          </table>
+
+          <table cellpadding=0 cellspacing=0 border=0>
+            <tr>
+              <td><br></td>
+            </tr>
+            <tr>
+              <td>
+<pre class="sourceHeading">            Line data    Source code</pre>
+<pre class="source">
+<span id="L1"><span class="lineNum">       1</span>              : // SPDX-License-Identifier: MIT</span>
+<span id="L2"><span class="lineNum">       2</span>              : pragma solidity ^0.8.24;</span>
+<span id="L3"><span class="lineNum">       3</span>              : </span>
+<span id="L4"><span class="lineNum">       4</span>              : import &quot;forge-std/Test.sol&quot;;</span>
+<span id="L5"><span class="lineNum">       5</span>              : import &quot;../src/TokenVault.sol&quot;;</span>
+<span id="L6"><span class="lineNum">       6</span>              : import &quot;@openzeppelin/contracts/token/ERC20/ERC20.sol&quot;;</span>
+<span id="L7"><span class="lineNum">       7</span>              : </span>
+<span id="L8"><span class="lineNum">       8</span>              : // 创建一个简单的ERC20代币用于测试</span>
+<span id="L9"><span class="lineNum">       9</span>              : contract MockERC20 is ERC20 {</span>
+<span id="L10"><span class="lineNum">      10</span> <span class="tlaGNC">           5 :     constructor(string memory name, string memory symbol) ERC20(name, symbol) {</span></span>
+<span id="L11"><span class="lineNum">      11</span> <span class="tlaGNC">           5 :         _mint(msg.sender, 1000000 * 10**18); // 铸造100万个代币</span></span>
+<span id="L12"><span class="lineNum">      12</span>              :     }</span>
+<span id="L13"><span class="lineNum">      13</span>              :     </span>
+<span id="L14"><span class="lineNum">      14</span> <span class="tlaGNC">          10 :     function mint(address to, uint256 amount) external {</span></span>
+<span id="L15"><span class="lineNum">      15</span> <span class="tlaGNC">          10 :         _mint(to, amount);</span></span>
+<span id="L16"><span class="lineNum">      16</span>              :     }</span>
+<span id="L17"><span class="lineNum">      17</span>              : }</span>
+<span id="L18"><span class="lineNum">      18</span>              : </span>
+<span id="L19"><span class="lineNum">      19</span>              : contract TokenVaultTest is Test {</span>
+<span id="L20"><span class="lineNum">      20</span>              :     TokenVault public vault;</span>
+<span id="L21"><span class="lineNum">      21</span>              :     MockERC20 public token;</span>
+<span id="L22"><span class="lineNum">      22</span>              :     </span>
+<span id="L23"><span class="lineNum">      23</span>              :     address public user1 = address(0x1);</span>
+<span id="L24"><span class="lineNum">      24</span>              :     address public user2 = address(0x2);</span>
+<span id="L25"><span class="lineNum">      25</span>              :     </span>
+<span id="L26"><span class="lineNum">      26</span>              :     // 声明事件以便在测试中使用</span>
+<span id="L27"><span class="lineNum">      27</span>              :     event Deposit(address indexed user, address indexed token, uint256 amount);</span>
+<span id="L28"><span class="lineNum">      28</span>              :     </span>
+<span id="L29"><span class="lineNum">      29</span>              :     // 在每个测试前执行</span>
+<span id="L30"><span class="lineNum">      30</span>              :     function setUp() public {</span>
+<span id="L31"><span class="lineNum">      31</span>              :         // 部署TokenVault合约</span>
+<span id="L32"><span class="lineNum">      32</span>              :         vault = new TokenVault();</span>
+<span id="L33"><span class="lineNum">      33</span>              :         </span>
+<span id="L34"><span class="lineNum">      34</span>              :         // 部署测试代币</span>
+<span id="L35"><span class="lineNum">      35</span>              :         token = new MockERC20(&quot;Test Token&quot;, &quot;TEST&quot;);</span>
+<span id="L36"><span class="lineNum">      36</span>              :         </span>
+<span id="L37"><span class="lineNum">      37</span>              :         // 给user1和user2分配一些代币</span>
+<span id="L38"><span class="lineNum">      38</span>              :         token.mint(user1, 1000 * 10**18);</span>
+<span id="L39"><span class="lineNum">      39</span>              :         token.mint(user2, 1000 * 10**18);</span>
+<span id="L40"><span class="lineNum">      40</span>              :     }</span>
+<span id="L41"><span class="lineNum">      41</span>              :     </span>
+<span id="L42"><span class="lineNum">      42</span>              :     // 测试存款功能</span>
+<span id="L43"><span class="lineNum">      43</span>              :     function testDeposit() public {</span>
+<span id="L44"><span class="lineNum">      44</span>              :         uint256 depositAmount = 100 * 10**18;</span>
+<span id="L45"><span class="lineNum">      45</span>              :         </span>
+<span id="L46"><span class="lineNum">      46</span>              :         // 切换到user1并授权代币</span>
+<span id="L47"><span class="lineNum">      47</span>              :         vm.startPrank(user1);</span>
+<span id="L48"><span class="lineNum">      48</span>              :         token.approve(address(vault), depositAmount);</span>
+<span id="L49"><span class="lineNum">      49</span>              :         </span>
+<span id="L50"><span class="lineNum">      50</span>              :         // user1存款</span>
+<span id="L51"><span class="lineNum">      51</span>              :         vault.deposit(address(token), depositAmount);</span>
+<span id="L52"><span class="lineNum">      52</span>              :         vm.stopPrank();</span>
+<span id="L53"><span class="lineNum">      53</span>              :         </span>
+<span id="L54"><span class="lineNum">      54</span>              :         // 验证余额</span>
+<span id="L55"><span class="lineNum">      55</span>              :         assertEq(vault.balances(user1, address(token)), depositAmount);</span>
+<span id="L56"><span class="lineNum">      56</span>              :         </span>
+<span id="L57"><span class="lineNum">      57</span>              :         // 验证代币已转移到合约</span>
+<span id="L58"><span class="lineNum">      58</span>              :         assertEq(token.balanceOf(address(vault)), depositAmount);</span>
+<span id="L59"><span class="lineNum">      59</span>              :         assertEq(token.balanceOf(user1), 900 * 10**18);</span>
+<span id="L60"><span class="lineNum">      60</span>              :     }</span>
+<span id="L61"><span class="lineNum">      61</span>              :     </span>
+<span id="L62"><span class="lineNum">      62</span>              :     // 测试提取功能</span>
+<span id="L63"><span class="lineNum">      63</span>              :     function testWithdraw() public {</span>
+<span id="L64"><span class="lineNum">      64</span>              :         uint256 depositAmount = 100 * 10**18;</span>
+<span id="L65"><span class="lineNum">      65</span>              :         uint256 withdrawAmount = 50 * 10**18;</span>
+<span id="L66"><span class="lineNum">      66</span>              :         </span>
+<span id="L67"><span class="lineNum">      67</span>              :         // 先存款</span>
+<span id="L68"><span class="lineNum">      68</span>              :         vm.startPrank(user1);</span>
+<span id="L69"><span class="lineNum">      69</span>              :         token.approve(address(vault), depositAmount);</span>
+<span id="L70"><span class="lineNum">      70</span>              :         vault.deposit(address(token), depositAmount);</span>
+<span id="L71"><span class="lineNum">      71</span>              :         vm.stopPrank();</span>
+<span id="L72"><span class="lineNum">      72</span>              :         </span>
+<span id="L73"><span class="lineNum">      73</span>              :         // 再提取</span>
+<span id="L74"><span class="lineNum">      74</span>              :         vm.prank(user1);</span>
+<span id="L75"><span class="lineNum">      75</span>              :         vault.withdraw(address(token), withdrawAmount);</span>
+<span id="L76"><span class="lineNum">      76</span>              :         </span>
+<span id="L77"><span class="lineNum">      77</span>              :         // 验证余额</span>
+<span id="L78"><span class="lineNum">      78</span>              :         assertEq(vault.balances(user1, address(token)), depositAmount - withdrawAmount);</span>
+<span id="L79"><span class="lineNum">      79</span>              :         </span>
+<span id="L80"><span class="lineNum">      80</span>              :         // 验证代币已转回用户</span>
+<span id="L81"><span class="lineNum">      81</span>              :         assertEq(token.balanceOf(user1), 950 * 10**18);</span>
+<span id="L82"><span class="lineNum">      82</span>              :         assertEq(token.balanceOf(address(vault)), 50 * 10**18);</span>
+<span id="L83"><span class="lineNum">      83</span>              :     }</span>
+<span id="L84"><span class="lineNum">      84</span>              :     </span>
+<span id="L85"><span class="lineNum">      85</span>              :     // 测试提取超过余额应该失败</span>
+<span id="L86"><span class="lineNum">      86</span>              :     function testWithdrawInsufficientBalance() public {</span>
+<span id="L87"><span class="lineNum">      87</span>              :         uint256 depositAmount = 100 * 10**18;</span>
+<span id="L88"><span class="lineNum">      88</span>              :         uint256 withdrawAmount = 200 * 10**18;</span>
+<span id="L89"><span class="lineNum">      89</span>              :         </span>
+<span id="L90"><span class="lineNum">      90</span>              :         // 先存款</span>
+<span id="L91"><span class="lineNum">      91</span>              :         vm.startPrank(user1);</span>
+<span id="L92"><span class="lineNum">      92</span>              :         token.approve(address(vault), depositAmount);</span>
+<span id="L93"><span class="lineNum">      93</span>              :         vault.deposit(address(token), depositAmount);</span>
+<span id="L94"><span class="lineNum">      94</span>              :         vm.stopPrank();</span>
+<span id="L95"><span class="lineNum">      95</span>              :         </span>
+<span id="L96"><span class="lineNum">      96</span>              :         // 尝试提取超过余额的数量，应该失败</span>
+<span id="L97"><span class="lineNum">      97</span>              :         vm.prank(user1);</span>
+<span id="L98"><span class="lineNum">      98</span>              :         vm.expectRevert(&quot;TokenVault: insufficient balance&quot;);</span>
+<span id="L99"><span class="lineNum">      99</span>              :         vault.withdraw(address(token), withdrawAmount);</span>
+<span id="L100"><span class="lineNum">     100</span>              :     }</span>
+<span id="L101"><span class="lineNum">     101</span>              :     </span>
+<span id="L102"><span class="lineNum">     102</span>              :     // 测试多个用户</span>
+<span id="L103"><span class="lineNum">     103</span>              :     function testMultipleUsers() public {</span>
+<span id="L104"><span class="lineNum">     104</span>              :         uint256 user1Deposit = 100 * 10**18;</span>
+<span id="L105"><span class="lineNum">     105</span>              :         uint256 user2Deposit = 200 * 10**18;</span>
+<span id="L106"><span class="lineNum">     106</span>              :         </span>
+<span id="L107"><span class="lineNum">     107</span>              :         // user1存款</span>
+<span id="L108"><span class="lineNum">     108</span>              :         vm.startPrank(user1);</span>
+<span id="L109"><span class="lineNum">     109</span>              :         token.approve(address(vault), user1Deposit);</span>
+<span id="L110"><span class="lineNum">     110</span>              :         vault.deposit(address(token), user1Deposit);</span>
+<span id="L111"><span class="lineNum">     111</span>              :         vm.stopPrank();</span>
+<span id="L112"><span class="lineNum">     112</span>              :         </span>
+<span id="L113"><span class="lineNum">     113</span>              :         // user2存款</span>
+<span id="L114"><span class="lineNum">     114</span>              :         vm.startPrank(user2);</span>
+<span id="L115"><span class="lineNum">     115</span>              :         token.approve(address(vault), user2Deposit);</span>
+<span id="L116"><span class="lineNum">     116</span>              :         vault.deposit(address(token), user2Deposit);</span>
+<span id="L117"><span class="lineNum">     117</span>              :         vm.stopPrank();</span>
+<span id="L118"><span class="lineNum">     118</span>              :         </span>
+<span id="L119"><span class="lineNum">     119</span>              :         // 验证两个用户的余额</span>
+<span id="L120"><span class="lineNum">     120</span>              :         assertEq(vault.balances(user1, address(token)), user1Deposit);</span>
+<span id="L121"><span class="lineNum">     121</span>              :         assertEq(vault.balances(user2, address(token)), user2Deposit);</span>
+<span id="L122"><span class="lineNum">     122</span>              :         </span>
+<span id="L123"><span class="lineNum">     123</span>              :         // 验证合约总余额</span>
+<span id="L124"><span class="lineNum">     124</span>              :         assertEq(token.balanceOf(address(vault)), user1Deposit + user2Deposit);</span>
+<span id="L125"><span class="lineNum">     125</span>              :     }</span>
+<span id="L126"><span class="lineNum">     126</span>              :     </span>
+<span id="L127"><span class="lineNum">     127</span>              :     // 测试事件</span>
+<span id="L128"><span class="lineNum">     128</span>              :     function testDepositEvent() public {</span>
+<span id="L129"><span class="lineNum">     129</span>              :         uint256 depositAmount = 100 * 10**18;</span>
+<span id="L130"><span class="lineNum">     130</span>              :         </span>
+<span id="L131"><span class="lineNum">     131</span>              :         vm.startPrank(user1);</span>
+<span id="L132"><span class="lineNum">     132</span>              :         token.approve(address(vault), depositAmount);</span>
+<span id="L133"><span class="lineNum">     133</span>              :         </span>
+<span id="L134"><span class="lineNum">     134</span>              :         // 期望触发Deposit事件</span>
+<span id="L135"><span class="lineNum">     135</span>              :         vm.expectEmit(true, true, false, false);</span>
+<span id="L136"><span class="lineNum">     136</span>              :         emit Deposit(user1, address(token), depositAmount);</span>
+<span id="L137"><span class="lineNum">     137</span>              :         </span>
+<span id="L138"><span class="lineNum">     138</span>              :         vault.deposit(address(token), depositAmount);</span>
+<span id="L139"><span class="lineNum">     139</span>              :         vm.stopPrank();</span>
+<span id="L140"><span class="lineNum">     140</span>              :     }</span>
+<span id="L141"><span class="lineNum">     141</span>              : }</span>
+        </pre>
+              </td>
+            </tr>
+          </table>
+          <br>
+
+          <table width="100%" border=0 cellspacing=0 cellpadding=0>
+            <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+            <tr><td class="versionInfo">Generated by: <a href="https://github.com//linux-test-project/lcov" target="_parent">LCOV version 2.4-2.gfa6c210</a></td></tr>
+          </table>
+          <br>
+
+</body>
+</html>

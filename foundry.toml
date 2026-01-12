@@ -1,0 +1,25 @@
+[profile.default]
+src = "src"
+out = "out"
+libs = ["lib"]
+solc = "0.8.28"
+evm_version = "cancun"
+
+
+[rpc_endpoints]
+sepolia = "${SEPOLIA_RPC}"
+mainnet = "${MAINNET_RPC}"
+local = "http://localhost:8545"
+
+[etherscan]
+sepolia = {key = "${ETHERSCAN_API_KEY}"}
+mainnet = {key = "${ETHERSCAN_API_KEY}"}
+
+
+[profile.ci]
+optimizer_runs = 1
+
+[profile.production]
+optimizer_runs = 10000
+
+# See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
